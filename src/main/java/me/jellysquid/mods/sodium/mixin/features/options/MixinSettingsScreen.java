@@ -23,12 +23,12 @@ public class MixinSettingsScreen extends Screen {
     @Dynamic
     @Inject(method = "method_19828(Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"), cancellable = true)
     private void open(ButtonWidget widget, CallbackInfo ci) {
-        if (this.minecraft != null) {
+        if (this.client != null) {
             if(SodiumClientMod.options().settings.forceVanillaSettings || VanillaOptions.inRun){
-                this.minecraft.openScreen(new VideoOptionsScreen(this, this.minecraft.options));
+                this.client.openScreen(new VideoOptionsScreen(this, this.client.options));
             }
             else {
-                this.minecraft.openScreen(new SodiumOptionsGUI(this));
+                this.client.openScreen(new SodiumOptionsGUI(this));
             }
 
             ci.cancel();
