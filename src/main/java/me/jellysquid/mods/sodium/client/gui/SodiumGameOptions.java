@@ -21,6 +21,7 @@ public class SodiumGameOptions {
     public final QualitySettings quality = new QualitySettings();
     public final AdvancedSettings advanced = new AdvancedSettings();
     public final UnofficialSettings unofficial = new UnofficialSettings();
+    public final SettingsSettings settings = new SettingsSettings();
 
     private File file;
 
@@ -113,6 +114,10 @@ public class SodiumGameOptions {
         public String getLocalizedName() {
             return this.name;
         }
+    }
+
+    public static class SettingsSettings {
+        public boolean forceVanillaSettings = false;
     }
 
     public enum GraphicsQuality implements TextProvider {
