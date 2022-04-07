@@ -8,6 +8,7 @@
   },
   "client": [
     "core.frustum.MixinFrustum",
+    "core.matrix.MixinGameRenderer",
     "core.matrix.MixinMatrix3f",
     "core.matrix.MixinMatrix4f",
     "core.model.MixinBlockColors",
@@ -48,5 +49,8 @@
     "features.texture_tracking.MixinSprite",
     "features.texture_tracking.MixinSpriteIdentifier",
     "features.world_ticking.MixinClientWorld"
+  ],
+  "mixins": [
+    "features.options.MixinVideoOptionsScreen"
   ]
 }
