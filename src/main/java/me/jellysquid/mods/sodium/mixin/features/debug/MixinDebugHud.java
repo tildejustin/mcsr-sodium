@@ -22,9 +22,19 @@ public abstract class MixinDebugHud {
         throw new UnsupportedOperationException();
     }
 
-    @Inject(method = "getRightText", at = @At("RETURN"))
-    private void appendRightText(CallbackInfoReturnable<List<String>> cir) {
-        List<String> strings = cir.getReturnValue();
+    @Redirect(method = "renderRightText", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/hud/DebugHud;getRightText()Ljava/util/List;"))
+    private List<String> redirectRightTextEarly(DebugHud instance) {
+        List<String> strings = ((DebugHudAccessor)instance).invokeGetRightText();
+        strings.add("");
+        strings.add("Sodium Renderer");
+        strings.add(Formatting.UNDERLINE + getFormattedVersionText());
+        strings.add("MrMangoHands' Build");
+        strings.add("");
+        strings.addAll(getChunkRendererDebugStrings());
+
+        if (SodiumClientMod.options().advanced.ignoreDriverBlacklist) {
+            strings.add(Formatting.RED + "(!!) Driver blacklist ignored");
+        }
 
         for (int i = 0; i < strings.size(); i++) {
             String str = strings.get(i);
