@@ -19,7 +19,7 @@ public class SodiumClientMod implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         ModContainer mod = FabricLoader.getInstance()
-                .getModContainer("sodium")
+                .getModContainer("sodiummac")
                 .orElseThrow(NullPointerException::new);
 
         MOD_VERSION = mod.getMetadata()
