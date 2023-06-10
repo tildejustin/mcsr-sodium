@@ -63,9 +63,9 @@ public abstract class LightDataAccess {
 
         float ao;
 
-        if (state == null) {
-            return packAO(1) | packLM(0) | packOP(true) | packFO(true) | (1L << 60);
-        } else if (state.getLuminance() == 0) {
+        if (state == null) return packAO(1) | packLM(0) | packOP(true) | packFO(true) | (1L << 60);
+        
+        if (state.getLuminance() == 0) {
             ao = state.getAmbientOcclusionLightLevel(world, pos);
         } else {
             ao = 1.0f;
