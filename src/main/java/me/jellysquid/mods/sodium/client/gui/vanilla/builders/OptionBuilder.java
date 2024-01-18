@@ -3,7 +3,6 @@ package me.jellysquid.mods.sodium.client.gui.vanilla.builders;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.options.OptionFlag;
 import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
-import net.minecraft.text.Text;
 import org.apache.commons.lang3.Validate;
 
 import java.util.EnumSet;
@@ -18,7 +17,7 @@ public abstract class OptionBuilder<P, T, U> {
 
     private String key;
     private String text;
-    private BiFunction<U, T, Text> textGetter;
+    private BiFunction<U, T, String> textGetter;
     private Function<SodiumGameOptions, U> getter;
     private BiConsumer<SodiumGameOptions, U> setter;
     private final Set<OptionFlag> localFlags = EnumSet.noneOf(OptionFlag.class);
@@ -55,12 +54,12 @@ public abstract class OptionBuilder<P, T, U> {
         return self();
     }
 
-    public P setTextGetter(Function<U, Text> textGetter){
+    public P setTextGetter(Function<U, String> textGetter){
         this.textGetter = (gameOptions, self) -> textGetter.apply(gameOptions);
         return self();
     }
 
-    public P setTextGetter(BiFunction<U, T, Text> textGetter){
+    public P setTextGetter(BiFunction<U, T, String> textGetter){
         this.textGetter = textGetter;
         return self();
     }
@@ -95,7 +94,7 @@ public abstract class OptionBuilder<P, T, U> {
         return setter;
     }
 
-    BiFunction<SodiumGameOptions, T, Text> getTextGetter(){
+    BiFunction<SodiumGameOptions, T, String> getTextGetter(){
         Validate.notNull(textGetter, "Text Getter must be specified");
         Function<SodiumGameOptions, U> getter = getGetter();
         return (gameOptions, option) -> {

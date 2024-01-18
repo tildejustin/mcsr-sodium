@@ -6,7 +6,6 @@ import me.jellysquid.mods.sodium.client.gui.VanillaOptions;
 import me.jellysquid.mods.sodium.client.gui.options.OptionFlag;
 import me.jellysquid.mods.sodium.client.gui.vanilla.builders.OptionBuilder;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gl.Framebuffer;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.VideoOptionsScreen;
 import net.minecraft.client.gui.screen.options.GameOptionsScreen;
@@ -16,12 +15,12 @@ import net.minecraft.client.options.Option;
 import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.IOException;
 import java.util.Set;
 
 @Mixin(VideoOptionsScreen.class)
@@ -46,7 +45,6 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
             Option.PARTICLES,
             Option.MIPMAP_LEVELS,
             Option.ENTITY_SHADOWS,
-            Option.ENTITY_DISTANCE_SCALING,
             VanillaOptions.ENTITY_CULLING
     };
 
@@ -76,20 +74,8 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
         if(flags.contains(OptionFlag.REQUIRES_RENDERER_RELOAD)){
             client.worldRenderer.reload();
         }
-        if(flags.contains(OptionFlag.REQUIRES_CLOUD_RELOAD)){
-            if(MinecraftClient.isFabulousGraphicsOrBetter()) {
-                Framebuffer framebuffer = client.worldRenderer.getCloudsFramebuffer();
-                if(framebuffer != null) {
-                    framebuffer.clear(MinecraftClient.IS_SYSTEM_MAC);
-                }
-            }
-        }
 
-        try {
-            SodiumClientMod.options().writeChanges();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        SodiumClientMod.options().writeChanges();
     }
 
     @Override

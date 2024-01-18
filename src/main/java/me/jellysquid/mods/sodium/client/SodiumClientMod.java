@@ -9,7 +9,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.util.HashMap;
 
 public class SodiumClientMod implements ClientModInitializer {
     private static SodiumGameOptions CONFIG;
@@ -19,7 +18,13 @@ public class SodiumClientMod implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
+        ModContainer mod = FabricLoader.getInstance()
+                .getModContainer("sodium")
+                .orElseThrow(NullPointerException::new);
 
+        MOD_VERSION = mod.getMetadata()
+                .getVersion()
+                .getFriendlyString();
     }
 
     public static SodiumGameOptions options() {
@@ -47,5 +52,13 @@ public class SodiumClientMod implements ClientModInitializer {
 
     public static void onConfigChanged(SodiumGameOptions options) {
         UnsafeUtil.setEnabled(options.advanced.useMemoryIntrinsics);
+    }
+
+    public static String getVersion() {
+        if (MOD_VERSION == null) {
+            throw new NullPointerException("Mod version hasn't been populated yet");
+        }
+
+        return MOD_VERSION;
     }
 }

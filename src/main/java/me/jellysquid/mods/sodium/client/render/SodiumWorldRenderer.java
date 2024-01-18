@@ -412,4 +412,8 @@ public class SodiumWorldRenderer implements ChunkStatusListener {
     public ChunkRenderBackend<?> getChunkRenderer() {
         return this.chunkRenderBackend;
     }
+
+    public boolean getUseEntityCulling() {
+        return this.useEntityCulling;
+    }
 }

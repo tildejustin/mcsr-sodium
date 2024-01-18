@@ -1,8 +1,7 @@
 package me.jellysquid.mods.sodium.client.gui.vanilla.options;
 
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions.GraphicsQuality;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
 
 public enum CloudsOptions implements IndexedOption {
     OFF(0, false, GraphicsQuality.DEFAULT, "options.off"),
@@ -12,12 +11,12 @@ public enum CloudsOptions implements IndexedOption {
     private final int index;
     private final boolean enabled;
     private final GraphicsQuality quality;
-    private final Text text;
+    private final String text;
     CloudsOptions(int index, boolean enabled, GraphicsQuality quality, String translationKey){
         this.index = index;
         this.enabled = enabled;
         this.quality = quality;
-        this.text = new TranslatableText(translationKey);
+        this.text = I18n.translate(translationKey);
     }
 
     public GraphicsQuality getQuality() {
@@ -33,7 +32,7 @@ public enum CloudsOptions implements IndexedOption {
         return index;
     }
 
-    public Text getText() {
+    public String getText() {
         return text;
     }
 

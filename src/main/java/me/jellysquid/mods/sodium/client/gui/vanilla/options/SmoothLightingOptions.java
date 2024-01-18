@@ -1,8 +1,7 @@
 package me.jellysquid.mods.sodium.client.gui.vanilla.options;
 
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions.LightingQuality;
-import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.client.resource.language.I18n;
 
 import java.util.EnumMap;
 import java.util.Map;
@@ -14,11 +13,11 @@ public enum SmoothLightingOptions implements IndexedOption {
 
     private final int index;
     private final LightingQuality option;
-    private final Text text;
+    private final String text;
     SmoothLightingOptions(int index, LightingQuality option, String translationKey){
         this.index = index;
         this.option = option;
-        this.text = new TranslatableText(translationKey);
+        this.text = I18n.translate(translationKey);
     }
 
     @Override
@@ -26,7 +25,7 @@ public enum SmoothLightingOptions implements IndexedOption {
         return index;
     }
 
-    public Text getText() {
+    public String getText() {
         return text;
     }
 

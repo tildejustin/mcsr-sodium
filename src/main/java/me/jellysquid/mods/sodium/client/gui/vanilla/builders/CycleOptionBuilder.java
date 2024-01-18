@@ -3,8 +3,6 @@ package me.jellysquid.mods.sodium.client.gui.vanilla.builders;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.vanilla.option.CyclingOption;
 import me.jellysquid.mods.sodium.client.gui.vanilla.options.IndexedOption;
-import net.minecraft.text.LiteralText;
-import net.minecraft.text.Text;
 import org.apache.commons.lang3.Validate;
 
 import java.util.function.BiFunction;
@@ -31,7 +29,7 @@ public class CycleOptionBuilder<V extends IndexedOption> extends OptionBuilder<C
     @Override
     public CyclingOption<V> build() {
         String text = this.getText();
-        BiFunction<SodiumGameOptions, CyclingOption<V>, Text> textGetter = getTextGetter();
+        BiFunction<SodiumGameOptions, CyclingOption<V>, String> textGetter = getTextGetter();
         return new CyclingOption<>(
                 getKey(),
                 sodiumOpts.getData(),
@@ -39,9 +37,9 @@ public class CycleOptionBuilder<V extends IndexedOption> extends OptionBuilder<C
                 getSetter(),
                 getGetter(),
                 text == null?
-                        (options, self) -> self.getDisplayPrefix().append(textGetter.apply(options, self))
+                        (options, self) -> self.getDisplayPrefix() + textGetter.apply(options, self)
                         :
-                        (options, self) -> new LiteralText(text).append(": ").append(textGetter.apply(options, self))
+                        (options, self) -> text + ": " + textGetter.apply(options, self)
         );
     }
 }
