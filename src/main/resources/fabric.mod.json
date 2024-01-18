@@ -5,7 +5,11 @@
   "name": "Sodium 1.15.2 Backport",
   "description": "Sodium is a free and open-source optimization mod for Minecraft which improves frame rates and reduces lag spikes.\nThis is an unofficial backport of JellySquid's original mod.",
   "authors": [
-    "MrMangoHands"
+    "jellysquid3",
+    "MrMangoHands",
+    "closet_witch",
+    "RedLime",
+    "tildejustin"
   ],
   "contact": {
     "homepage": "https://github.com/mrmangohands/sodium-fabric",
