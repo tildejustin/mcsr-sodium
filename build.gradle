@@ -1,35 +1,12 @@
 plugins {
-    id 'fabric-loom' version '0.6-SNAPSHOT'
-    id 'org.ajoberstar.grgit' version '4.1.0'
+    id 'fabric-loom' version '1.5-SNAPSHOT'
 }
 
-def getVersionMetadata() {
-    // CI builds version numbers
-    def build_id = System.getenv("RELEASE_TAG")
-    if (build_id != null) {
-        return build_id
-    }
+archivesBaseName = project.mod_id
+version = "$project.mod_version+$project.minecraft_version"
 
-    // Development builds
-    if (grgit == null) {
-        return "dev"
-    }
-
-    // Named development builds
-    def id = grgit.head().abbreviatedId
-    if (!grgit.status().clean) {
-        id += "-dirty"
-    }
-
-    return "rev.${id}"
-}
-
-archivesBaseName = "${project.mod_id}-${project.minecraft_version}"
-version = "${getVersionMetadata()}"
-
-minecraft {
-    refmapName = "mixins.sodium.refmap.json"
-    accessWidener = file("src/main/resources/sodium.accesswidener")
+loom {
+    accessWidenerPath = file("src/main/resources/sodium.accesswidener")
 }
 
 dependencies {
@@ -37,20 +14,6 @@ dependencies {
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
-}
-
-if (project.use_third_party_mods) {
-    repositories {
-        maven { url = "https://jitpack.io" }
-    }
-
-    dependencies {
-        // DataBreaker applies a number of patches to eliminate the loading of data fixers
-        // This greatly reduces the amount of time needed to start the game, but is generally unsafe in production
-        modRuntime ("com.github.SuperCoder7979:databreaker:${project.databreaker_version}") {
-            transitive = false
-        }
-    }
 }
 
 processResources {
