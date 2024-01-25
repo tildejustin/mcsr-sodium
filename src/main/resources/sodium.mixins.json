@@ -48,5 +48,11 @@
     "features.texture_tracking.MixinSprite",
     "features.texture_tracking.MixinSpriteIdentifier",
     "features.world_ticking.MixinClientWorld"
+  ],
+  "mixins": [
+    "features.debug.DebugHudAccessor",
+    "features.options.MinecraftServerMixin",
+    "features.options.MixinDoubleOption",
+    "features.options.MixinVideoOptionsScreen"
   ]
 }

@@ -1,8 +1,11 @@
 package me.jellysquid.mods.sodium.mixin.features.options;
 
+import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
+import me.jellysquid.mods.sodium.client.gui.VanillaOptions;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.SettingsScreen;
+import net.minecraft.client.gui.screen.VideoOptionsScreen;
 import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.text.Text;
 import org.spongepowered.asm.mixin.Dynamic;
@@ -20,8 +23,15 @@ public class MixinSettingsScreen extends Screen {
     @Dynamic
     @Inject(method = "method_19828(Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"), cancellable = true)
     private void open(ButtonWidget widget, CallbackInfo ci) {
-        this.minecraft.openScreen(new SodiumOptionsGUI(this));
+        if (this.minecraft != null) {
+            if(SodiumClientMod.options().settings.forceVanillaSettings || VanillaOptions.inRun){
+                this.minecraft.openScreen(new VideoOptionsScreen(this, this.minecraft.options));
+            }
+            else {
+                this.minecraft.openScreen(new SodiumOptionsGUI(this));
+            }
 
-        ci.cancel();
+            ci.cancel();
+        }
     }
 }
