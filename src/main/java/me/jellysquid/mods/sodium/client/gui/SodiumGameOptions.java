@@ -19,7 +19,6 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class SodiumGameOptions {
-    public final QualitySettings quality = new QualitySettings();
     public final AdvancedSettings advanced = new AdvancedSettings();
     public final SettingsSettings settings = new SettingsSettings();
     public final UnofficialSettings unofficial = new UnofficialSettings();
@@ -40,16 +39,6 @@ public class SodiumGameOptions {
         public boolean useChunkFaceCulling = true;
         public boolean useMemoryIntrinsics = true;
         public boolean disableDriverBlacklist = false;
-    }
-
-    public static class QualitySettings {
-        public GraphicsQuality cloudQuality = GraphicsQuality.DEFAULT;
-        public GraphicsQuality weatherQuality = GraphicsQuality.DEFAULT;
-
-        public boolean enableVignette = true;
-        public boolean enableClouds = true;
-
-        public LightingQuality smoothLighting = LightingQuality.HIGH;
     }
 
     public static class UnofficialSettings {
