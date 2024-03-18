@@ -3,9 +3,8 @@ package me.jellysquid.mods.sodium.client.gui;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
-import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
-import net.minecraft.client.options.GraphicsMode;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -54,15 +53,17 @@ public class SodiumGameOptions {
             .create();
 
     public static SodiumGameOptions load(Path path) {
-        SodiumGameOptions config;
+        SodiumGameOptions config = null;
 
-        if (Files.exists(path)) {
+        boolean exists = Files.exists(path);
+        if (exists) {
             try (FileReader reader = new FileReader(path.toFile())) {
                 config = GSON.fromJson(reader, SodiumGameOptions.class);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not parse config", e);
+            } catch (IOException | JsonSyntaxException e) {
+                SodiumClientMod.logger().warn("Could not parse config, falling back to default");
             }
-        } else {
+        }
+        if (!exists || config == null) {
             config = new SodiumGameOptions();
         }
 
