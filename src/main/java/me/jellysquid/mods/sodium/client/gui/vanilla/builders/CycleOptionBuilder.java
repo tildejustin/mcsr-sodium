@@ -39,7 +39,7 @@ public class CycleOptionBuilder<V extends IndexedOption> extends OptionBuilder<C
                 getSetter(),
                 getGetter(),
                 text == null?
-                        (options, self) -> self.getDisplayPrefix().append(textGetter.apply(options, self))
+                        (options, self) -> self.getDisplayPrefix().shallowCopy().append(textGetter.apply(options, self))
                         :
                         (options, self) -> new LiteralText(text).append(": ").append(textGetter.apply(options, self))
         );

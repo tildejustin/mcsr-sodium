@@ -12,8 +12,8 @@ import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage
 import me.jellysquid.mods.sodium.client.render.chunk.backends.multidraw.MultidrawChunkRenderBackend;
 import me.jellysquid.mods.sodium.client.util.UnsafeUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.Option;
 import net.minecraft.client.options.*;
+import net.minecraft.client.options.Option;
 import net.minecraft.client.util.Window;
 
 import java.util.ArrayList;
@@ -80,7 +80,7 @@ public class SodiumGameOptionPages {
                         .setTooltip("If enabled, the game's frame rate will be synchronized to the monitor's refresh rate, making for a generally smoother experience " +
                                 "at the expense of overall input latency. This setting might reduce performance if your system is too slow.")
                         .setControl(TickBoxControl::new)
-                        .setBinding(new VanillaBooleanOptionBinding(Option.VSYNC))
+                        .setBinding(new VanillaBooleanOptionBinding(net.minecraft.client.options.Option.VSYNC))
                         .setImpact(OptionImpact.VARIES)
                         .build())
                 .add(OptionImpl.createBuilder(int.class, vanillaOpts)
@@ -101,7 +101,7 @@ public class SodiumGameOptionPages {
                         .setName("View Bobbing")
                         .setTooltip("If enabled, the player's view will sway and bob when moving around. Players who suffer from motion sickness can benefit from disabling this.")
                         .setControl(TickBoxControl::new)
-                        .setBinding(new VanillaBooleanOptionBinding(Option.VIEW_BOBBING))
+                        .setBinding(new VanillaBooleanOptionBinding(Option.VSYNC))
                         .build())
                 .add(OptionImpl.createBuilder(AttackIndicator.class, vanillaOpts)
                         .setName("Attack Indicator")
@@ -146,11 +146,11 @@ public class SodiumGameOptionPages {
                         .setBinding((opts, value) -> opts.particles = value, (opts) -> opts.particles)
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(AoOption.class, vanillaOpts)
+                .add(OptionImpl.createBuilder(AoMode.class, vanillaOpts)
                         .setName("Smooth Lighting")
                         .setTooltip("Controls whether blocks will be smoothly lit and shaded. This slightly increases the amount " +
                                 "of time needed to re-build a chunk, but doesn't affect frame rates.")
-                        .setControl(option -> new CyclingControl<>(option, AoOption.class, new String[] { "Off", "Minimum", "Maximum" }))
+                        .setControl(option -> new CyclingControl<>(option, AoMode.class, new String[] { "Off", "Minimum", "Maximum" }))
                         .setBinding((opts, value) -> opts.ao = value, opts -> opts.ao)
                         .setImpact(OptionImpact.LOW)
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)

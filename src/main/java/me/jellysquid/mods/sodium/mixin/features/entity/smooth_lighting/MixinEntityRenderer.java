@@ -4,7 +4,7 @@ import me.jellysquid.mods.sodium.client.model.light.EntityLighter;
 import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import me.jellysquid.mods.sodium.client.render.entity.EntityLightSampler;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.options.AoOption;
+import net.minecraft.client.options.AoMode;
 import net.minecraft.client.render.Frustum;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.entity.Entity;
@@ -26,7 +26,7 @@ public abstract class MixinEntityRenderer<T extends Entity> implements EntityLig
     @Inject(method = "getLight", at = @At("HEAD"), cancellable = true)
     private void preGetLight(T entity, float tickDelta, CallbackInfoReturnable<Integer> cir) {
         // Use smooth entity lighting if enabled
-        if (MinecraftClient.getInstance().options.ao == AoOption.MAX) {
+        if (MinecraftClient.getInstance().options.ao == AoMode.MAX) {
             cir.setReturnValue(EntityLighter.getBlendedLight(this, entity, tickDelta));
         }
     }
