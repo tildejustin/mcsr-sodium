@@ -138,6 +138,7 @@ public class SodiumGameOptionPages {
                         .setControl(option -> new CyclingControl<>(option, CloudRenderMode.class, new String[] { "Off", "Fast", "Fancy" }))
                         .setBinding((opts, value) -> opts.cloudRenderMode = value, opts -> opts.cloudRenderMode)
                         .setImpact(OptionImpact.LOW)
+                        .setFlags(OptionFlag.REQUIRES_CLOUD_RELOAD)
                         .build())
                 .add(OptionImpl.createBuilder(ParticlesOption.class, vanillaOpts)
                         .setName("Particle Quality")
