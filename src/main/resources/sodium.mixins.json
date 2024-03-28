@@ -13,6 +13,7 @@
     "core.MinecraftClientMixin",
     "core.WindowMixin",
     "core.gui.WorldLoadingStateMixin",
+    "core.matrix.EntryAccessor",
     "core.model.colors.BlockColorsMixin",
     "core.model.colors.ItemColorsMixin",
     "core.model.quad.BakedQuadMixin",

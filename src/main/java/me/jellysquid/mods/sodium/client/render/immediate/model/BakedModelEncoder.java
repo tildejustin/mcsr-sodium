@@ -1,6 +1,7 @@
 package me.jellysquid.mods.sodium.client.render.immediate.model;
 
 import me.jellysquid.mods.sodium.client.model.quad.ModelQuadView;
+import me.jellysquid.mods.sodium.mixin.core.matrix.EntryAccessor;
 import net.caffeinemc.mods.sodium.api.math.MatrixHelper;
 import net.caffeinemc.mods.sodium.api.util.ColorABGR;
 import net.caffeinemc.mods.sodium.api.util.ColorU8;
@@ -21,7 +22,7 @@ public class BakedModelEncoder {
             long ptr = buffer;
 
             // The packed transformed normal vector
-            var normal = MatrixHelper.transformNormal(matNormal, quad.getLightFace());
+            var normal = MatrixHelper.transformNormal(matNormal, quad.getLightFace(), ((EntryAccessor) (Object) matrices).canSkipNormalization());
 
             for (int i = 0; i < 4; i++) {
                 // The position vector
@@ -42,7 +43,7 @@ public class BakedModelEncoder {
         }
     }
 
-    public static void writeQuadVertices(VertexBufferWriter writer, MatrixStack.Entry matrices, ModelQuadView quad, float r, float g, float b, float[] brightnessTable, boolean colorize, int[] light, int overlay) {
+    public static void writeQuadVertices(VertexBufferWriter writer, MatrixStack.Entry matrices, ModelQuadView quad, float r, float g, float b, float a, float[] brightnessTable, boolean colorize, int[] light, int overlay) {
         Matrix3f matNormal = matrices.getNormalMatrix();
         Matrix4f matPosition = matrices.getPositionMatrix();
 
@@ -51,7 +52,7 @@ public class BakedModelEncoder {
             long ptr = buffer;
 
             // The packed transformed normal vector
-            var normal = MatrixHelper.transformNormal(matNormal, quad.getLightFace());
+            var normal = MatrixHelper.transformNormal(matNormal, quad.getLightFace(), ((EntryAccessor) (Object) matrices).canSkipNormalization());
 
             for (int i = 0; i < 4; i++) {
                 // The position vector
@@ -86,7 +87,7 @@ public class BakedModelEncoder {
                     fB = brightness * b;
                 }
 
-                int color = ColorABGR.pack(fR, fG, fB, 1.0F);
+                int color = ColorABGR.pack(fR, fG, fB, a);
 
                 ModelVertex.write(ptr, xt, yt, zt, color, quad.getTexU(i), quad.getTexV(i), overlay, light[i], normal);
                 ptr += ModelVertex.STRIDE;
