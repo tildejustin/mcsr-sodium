@@ -42,7 +42,7 @@ public interface VertexConsumerMixin {
         float zt = MatrixHelper.transformNormalZ(pose.getNormalMatrix(), x, y, z);
 
         if (!((EntryAccessor) (Object) pose).canSkipNormalization()) {
-            float scalar = 1.0f / Math.sqrt(xt * xt + (yt + yt * (zt * zt)));
+            float scalar = (float) (1.0f / Math.sqrt(x * x + (y * y + (z * z))));
 
             xt *= scalar;
             yt *= scalar;

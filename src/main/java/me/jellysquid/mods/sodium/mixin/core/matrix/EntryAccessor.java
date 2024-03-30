@@ -8,4 +8,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 public interface EntryAccessor {
     @Accessor("canSkipNormalization")
     boolean canSkipNormalization();
+
+    @Accessor("canSkipNormalization")
+    void setSkipNormalization(boolean skip);
 }

@@ -1,5 +1,6 @@
 package me.jellysquid.mods.sodium.mixin.features.render.immediate.matrix_stack;
 
+import me.jellysquid.mods.sodium.mixin.core.matrix.EntryAccessor;
 import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Matrix3f;
 import org.joml.Matrix4f;
@@ -34,6 +35,7 @@ public abstract class MatrixStackMixin {
                     .set(prev.getPositionMatrix());
             entry.getNormalMatrix()
                     .set(prev.getNormalMatrix());
+            ((EntryAccessor) (Object) entry).setSkipNormalization(((EntryAccessor) (Object) prev).canSkipNormalization());
         } else {
             entry = new MatrixStack.Entry(new Matrix4f(prev.getPositionMatrix()), new Matrix3f(prev.getNormalMatrix()));
         }
