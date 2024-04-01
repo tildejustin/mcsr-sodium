@@ -1,9 +1,9 @@
 object Constants {
     // https://fabricmc.net/develop/
-    const val MINECRAFT_VERSION: String = "1.20.4"
-    const val YARN_VERSION: String = "1.20.4+build.3"
-    const val FABRIC_LOADER_VERSION: String = "0.15.6"
-    const val FABRIC_API_VERSION: String = "0.95.3+1.20.4"
+    const val MINECRAFT_VERSION: String = "24w14potato"
+    const val YARN_VERSION: String = "24w14potato+build.3"
+    const val FABRIC_LOADER_VERSION: String = "0.15.7"
+    const val FABRIC_API_VERSION: String = "0.96.14+24w14potato"
 
     // https://semver.org/
     const val MOD_VERSION: String = "0.5.8"

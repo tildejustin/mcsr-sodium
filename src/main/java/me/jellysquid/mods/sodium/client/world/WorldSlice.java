@@ -250,6 +250,11 @@ public final class WorldSlice implements BlockRenderView, BiomeColorView, Render
     }
 
     @Override
+    public boolean method_58798() {
+        return this.world.method_58798();
+    }
+
+    @Override
     public float getBrightness(Direction direction, boolean shaded) {
         return this.world.getBrightness(direction, shaded);
     }

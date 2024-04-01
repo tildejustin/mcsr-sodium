@@ -19,9 +19,9 @@ public abstract class BufferBuilderMixin extends FixedColorVertexConsumer {
     private boolean canSkipElementChecks;
 
     @Override
-    public void quad(MatrixStack.Entry matrices, BakedQuad bakedQuad, float r, float g, float b, int light, int overlay) {
+    public void quad(MatrixStack.Entry matrices, BakedQuad bakedQuad, float r, float g, float b, float alpha, int light, int overlay) {
         if (!this.canSkipElementChecks) {
-            super.quad(matrices, bakedQuad, r, g, b, light, overlay);
+            super.quad(matrices, bakedQuad, r, g, b, alpha, light, overlay);
 
             SpriteUtil.markSpriteActive(bakedQuad.getSprite());
 
@@ -47,9 +47,9 @@ public abstract class BufferBuilderMixin extends FixedColorVertexConsumer {
     }
 
     @Override
-    public void quad(MatrixStack.Entry matrices, BakedQuad bakedQuad, float[] brightnessTable, float r, float g, float b, int[] light, int overlay, boolean colorize) {
+    public void quad(MatrixStack.Entry matrices, BakedQuad bakedQuad, float[] brightnessTable, float r, float g, float b, float alpha, int[] light, int overlay, boolean colorize) {
         if (!this.canSkipElementChecks) {
-            super.quad(matrices, bakedQuad, brightnessTable, r, g, b, light, overlay, colorize);
+            super.quad(matrices, bakedQuad, brightnessTable, r, g, b, alpha, light, overlay, colorize);
 
             SpriteUtil.markSpriteActive(bakedQuad.getSprite());
 

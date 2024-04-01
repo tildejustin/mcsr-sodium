@@ -8,6 +8,7 @@ accessible class net/minecraft/client/texture/SpriteContents$AnimationFrame
 accessible class net/minecraft/client/texture/SpriteContents$AnimatorImpl
 accessible class net/minecraft/world/chunk/PalettedContainer$Data
 accessible class net/minecraft/world/chunk/PalettedContainer$DataProvider
+accessible class net/minecraft/client/font/TextRenderer$Drawer
 accessible class net/minecraft/client/render/BackgroundRenderer$FogData
 accessible class net/minecraft/client/render/BackgroundRenderer$StatusEffectFogModifier
 accessible class net/minecraft/client/texture/TextureStitcher$Holder
