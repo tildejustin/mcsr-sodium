@@ -21,7 +21,7 @@ base {
     archivesName = "sodium-fabric"
 
     group = "me.jellysquid.mods"
-    version = createVersionString()
+    version = "${Constants.MOD_VERSION}+mc${Constants.MINECRAFT_VERSION}"
 }
 
 loom {
@@ -116,30 +116,4 @@ tasks {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-}
-
-fun createVersionString(): String {
-    val builder = StringBuilder()
-
-    val isReleaseBuild = project.hasProperty("build.release")
-    val buildId = System.getenv("GITHUB_RUN_NUMBER")
-
-    if (isReleaseBuild) {
-        builder.append(Constants.MOD_VERSION)
-    } else {
-        builder.append(Constants.MOD_VERSION.substringBefore('-'))
-        builder.append("-snapshot")
-    }
-
-    builder.append("+mc").append(Constants.MINECRAFT_VERSION)
-
-    if (!isReleaseBuild) {
-        if (buildId != null) {
-            builder.append("-build.${buildId}")
-        } else {
-            builder.append("-local")
-        }
-    }
-
-    return builder.toString()
 }

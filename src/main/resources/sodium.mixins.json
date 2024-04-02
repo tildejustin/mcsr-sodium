@@ -24,7 +24,6 @@
     "core.render.immediate.consumer.SpriteTexturedVertexConsumerMixin",
     "core.render.immediate.consumer.VertexConsumersMixin$DualMixin",
     "core.render.immediate.consumer.VertexConsumersMixin$UnionMixin",
-    "core.render.text.TextRenderer$DrawerMixin",
     "core.render.world.BufferBuilderStorageMixin",
     "core.render.world.WorldRendererMixin",
     "core.world.biome.ClientWorldMixin",
