@@ -1,9 +1,10 @@
 object Constants {
     // https://fabricmc.net/develop/
-    const val MINECRAFT_VERSION: String = "24w13a"
-    const val YARN_VERSION: String = "24w13a+build.7"
-    const val FABRIC_LOADER_VERSION: String = "0.15.7"
-    const val FABRIC_API_VERSION: String = "0.96.12+1.20.5"
+    const val MINECRAFT_VERSION: String = "24w14potato"
+    // build.4 has a conflict
+    const val YARN_VERSION: String = "24w14potato+build.3"
+    const val FABRIC_LOADER_VERSION: String = "0.15.8"
+    const val FABRIC_API_VERSION: String = "0.96.14+24w14potato"
 
     // https://semver.org/
     const val MOD_VERSION: String = "0.5.8"
@@ -21,7 +22,7 @@ base {
     archivesName = "sodium-fabric"
 
     group = "me.jellysquid.mods"
-    version = createVersionString()
+    version = "${Constants.MOD_VERSION}+mc${Constants.MINECRAFT_VERSION}"
 }
 
 loom {
@@ -116,30 +117,4 @@ tasks {
 // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
 tasks.withType<JavaCompile> {
     options.encoding = "UTF-8"
-}
-
-fun createVersionString(): String {
-    val builder = StringBuilder()
-
-    val isReleaseBuild = project.hasProperty("build.release")
-    val buildId = System.getenv("GITHUB_RUN_NUMBER")
-
-    if (isReleaseBuild) {
-        builder.append(Constants.MOD_VERSION)
-    } else {
-        builder.append(Constants.MOD_VERSION.substringBefore('-'))
-        builder.append("-snapshot")
-    }
-
-    builder.append("+mc").append(Constants.MINECRAFT_VERSION)
-
-    if (!isReleaseBuild) {
-        if (buildId != null) {
-            builder.append("-build.${buildId}")
-        } else {
-            builder.append("-local")
-        }
-    }
-
-    return builder.toString()
 }

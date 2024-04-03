@@ -9,7 +9,6 @@ import net.minecraft.client.render.BackgroundRenderer;
 import net.minecraft.client.render.Camera;
 import net.minecraft.client.render.CameraSubmersionType;
 import net.minecraft.client.render.WorldRenderer;
-import net.minecraft.client.util.math.MatrixStack;
 
 @Mixin(WorldRenderer.class)
 public class WorldRendererMixin {
@@ -30,7 +29,7 @@ public class WorldRendererMixin {
      * <p>When updating Sodium to new releases of the game, please check for new
      * ways the fog can be reduced in {@link BackgroundRenderer#applyFog(Camera, BackgroundRenderer.FogType, float, boolean, float)} ()}.</p>
      */
-    @Inject(method = "renderSky", at = @At("HEAD"), cancellable = true)
+    @Inject(method = "renderSky(Lorg/joml/Matrix4f;Lorg/joml/Matrix4f;FLnet/minecraft/client/render/Camera;ZLjava/lang/Runnable;)V", at = @At("HEAD"), cancellable = true)
     private void preRenderSky(Matrix4f matrix4f, Matrix4f matrix4f2, float f, Camera camera, boolean bl, Runnable runnable, CallbackInfo ci) {
         // Cancels sky rendering when the camera is submersed underwater.
         // This prevents the sky from being visible through chunks culled by Sodium's fog occlusion.
