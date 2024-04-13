@@ -147,7 +147,7 @@ public class SodiumWorldRenderer implements ChunkStatusListener {
     public void updateChunks(Camera camera, Frustum frustum, boolean hasForcedFrustum, int frame, boolean spectator) {
         this.frustum = frustum;
 
-        this.useEntityCulling = SodiumClientMod.options().advanced.useAdvancedEntityCulling;
+        this.useEntityCulling = SodiumClientMod.options().advanced.useEntityCulling;
 
         if (this.client.options.viewDistance != this.renderDistance) {
             this.reload();
