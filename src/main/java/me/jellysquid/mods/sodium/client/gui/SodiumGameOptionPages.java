@@ -172,6 +172,14 @@ public class SodiumGameOptionPages {
                         .setBinding((opts, value) -> opts.entityShadows = value, opts -> opts.entityShadows)
                         .setImpact(OptionImpact.LOW)
                         .build())
+                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                        .setName("Vignette")
+                        .setTooltip("If enabled, a vignette effect will be rendered on the player's view. This is very unlikely to make a difference " +
+                                "to frame rates unless you are fill-rate limited.")
+                        .setControl(TickBoxControl::new)
+                        .setBinding((opts, value) -> opts.quality.enableVignette = value, opts -> opts.quality.enableVignette)
+                        .setImpact(OptionImpact.LOW)
+                        .build())
                 .build());
 
 
