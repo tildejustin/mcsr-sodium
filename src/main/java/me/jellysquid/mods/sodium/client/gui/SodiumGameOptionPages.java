@@ -257,7 +257,7 @@ public class SodiumGameOptionPages {
                                 "takes into account the current set of visible chunks and removes entities which are not in any visible chunks.")
                         .setControl(TickBoxControl::new)
                         .setImpact(OptionImpact.MEDIUM)
-                        .setBinding((opts, value) -> opts.advanced.useAdvancedEntityCulling = value, opts -> opts.advanced.useAdvancedEntityCulling)
+                        .setBinding((opts, value) -> opts.advanced.useEntityCulling = value, opts -> opts.advanced.useEntityCulling)
                         .build()
                 )
                 .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
