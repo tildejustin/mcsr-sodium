@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class SodiumGameOptions {
+    public final QualitySettings quality = new QualitySettings();
     public final AdvancedSettings advanced = new AdvancedSettings();
     public final NotificationSettings notifications = new NotificationSettings();
     public final SpeedrunSettings speedrun = new SpeedrunSettings();
@@ -36,6 +37,10 @@ public class SodiumGameOptions {
         public boolean useBlockFaceCulling = true;
         public boolean allowDirectMemoryAccess = true;
         public boolean ignoreDriverBlacklist = false;
+    }
+
+    public static class QualitySettings {
+        public boolean enableVignette = true;
     }
 
     public static class NotificationSettings {
