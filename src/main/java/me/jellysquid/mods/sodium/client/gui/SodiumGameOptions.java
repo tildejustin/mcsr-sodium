@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 public class SodiumGameOptions {
+    public final QualitySettings quality = new QualitySettings();
     public final AdvancedSettings advanced = new AdvancedSettings();
     public final SettingsSettings settings = new SettingsSettings();
     public final UnofficialSettings unofficial = new UnofficialSettings();
@@ -40,6 +41,10 @@ public class SodiumGameOptions {
         public boolean useChunkFaceCulling = true;
         public boolean useMemoryIntrinsics = true;
         public boolean disableDriverBlacklist = false;
+    }
+
+    public static class QualitySettings {
+        public boolean enableVignette = true;
     }
 
     public static class UnofficialSettings {
