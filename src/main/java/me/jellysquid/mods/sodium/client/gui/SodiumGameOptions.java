@@ -3,6 +3,7 @@ package me.jellysquid.mods.sodium.client.gui;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
 import me.jellysquid.mods.sodium.client.render.chunk.backends.gl20.GL20ChunkRenderBackend;
@@ -31,7 +32,7 @@ public class SodiumGameOptions {
     public static class AdvancedSettings {
         public ChunkRendererBackendOption chunkRendererBackend = ChunkRendererBackendOption.BEST;
         public boolean animateOnlyVisibleTextures = true;
-        public boolean useAdvancedEntityCulling = true;
+        public boolean useEntityCulling = false;
         public boolean useParticleCulling = true;
         public boolean useFogOcclusion = true;
         public boolean useCompactVertexFormat = true;
@@ -41,13 +42,7 @@ public class SodiumGameOptions {
     }
 
     public static class QualitySettings {
-        public GraphicsQuality cloudQuality = GraphicsQuality.DEFAULT;
-        public GraphicsQuality weatherQuality = GraphicsQuality.DEFAULT;
-
         public boolean enableVignette = true;
-        public boolean enableClouds = true;
-
-        public LightingQuality smoothLighting = LightingQuality.HIGH;
     }
 
     public static class UnofficialSettings {
@@ -78,7 +73,11 @@ public class SodiumGameOptions {
             return this.supportedFunc.isSupported(disableBlacklist);
         }
 
-        public static ChunkRendererBackendOption[] getAvailableOptions(boolean disableBlacklist) {
+        public static class QualitySettings {
+        public boolean enableVignette = true;
+    }
+
+    public static ChunkRendererBackendOption[] getAvailableOptions(boolean disableBlacklist) {
             return streamAvailableOptions(disableBlacklist)
                     .toArray(ChunkRendererBackendOption[]::new);
         }
@@ -115,48 +114,6 @@ public class SodiumGameOptions {
         }
     }
 
-    public enum GraphicsQuality implements TextProvider {
-        DEFAULT("Default"),
-        FANCY("Fancy"),
-        FAST("Fast");
-
-        private final String name;
-
-        GraphicsQuality(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getLocalizedName() {
-            return this.name;
-        }
-
-        public boolean isFancy() {
-            return this == FANCY;
-        }
-
-        public boolean isFancy(boolean def) {
-            return this == DEFAULT ? def : this.isFancy();
-        }
-    }
-
-    public enum LightingQuality implements TextProvider {
-        HIGH("High"),
-        LOW("Low"),
-        OFF("Off");
-
-        private final String name;
-
-        LightingQuality(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getLocalizedName() {
-            return this.name;
-        }
-    }
-
     private static final Gson gson = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .setPrettyPrinting()
@@ -164,20 +121,21 @@ public class SodiumGameOptions {
             .create();
 
     public static SodiumGameOptions load(File file) {
-        SodiumGameOptions config;
+        SodiumGameOptions config = null;
 
-        if (file.exists()) {
+        boolean exists = file.exists();
+        if (exists) {
             try (FileReader reader = new FileReader(file)) {
                 config = gson.fromJson(reader, SodiumGameOptions.class);
-            } catch (IOException e) {
-                throw new RuntimeException("Could not parse config", e);
+            } catch (IOException | JsonSyntaxException e) {
+                SodiumClientMod.logger().warn("Could not parse config, falling back to default");
             }
-
-            config.sanitize();
-        } else {
+        }
+        if (!exists || config == null) {
             config = new SodiumGameOptions();
         }
 
+        config.sanitize();
         config.file = file;
         config.writeChanges();
 
