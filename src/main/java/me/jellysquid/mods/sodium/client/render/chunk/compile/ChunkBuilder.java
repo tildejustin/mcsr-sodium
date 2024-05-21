@@ -318,7 +318,12 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
             if (job == null) {
                 synchronized (ChunkBuilder.this.jobNotifier) {
                     try {
-                        ChunkBuilder.this.jobNotifier.wait();
+                        // it is possible for notifyAll in stopWorkers to be called before this wait call, causing a deadlock.
+                        // as running will be set to false before notifyAll is called, this check should suffice to avoid the thread
+                        // locking after stopWorkers has been started
+                        if (this.running.get()) {
+                            ChunkBuilder.this.jobNotifier.wait();
+                        }
                     } catch (InterruptedException ignored) {
                     }
                 }
