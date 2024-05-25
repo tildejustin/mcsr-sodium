@@ -1,8 +1,6 @@
 package net.caffeinemc.mods.sodium.client.gui;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.annotations.SerializedName;
 import net.caffeinemc.mods.sodium.client.gui.options.TextProvider;
 import net.caffeinemc.mods.sodium.client.util.FileUtil;
@@ -13,6 +11,7 @@ import net.minecraft.network.chat.Component;
 import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -63,8 +62,7 @@ public class SodiumGameOptions {
     public static class QualitySettings {
         public GraphicsQuality weatherQuality = GraphicsQuality.DEFAULT;
         public GraphicsQuality leavesQuality = GraphicsQuality.DEFAULT;
-
-        public boolean enableVignette = true;
+        public GraphicsQuality enableVignette = GraphicsQuality.FAST;
     }
 
     public static class NotificationSettings {
@@ -91,12 +89,23 @@ public class SodiumGameOptions {
         public boolean isFancy(GraphicsStatus graphicsStatus) {
             return (this == FANCY) || (this == DEFAULT && (graphicsStatus == GraphicsStatus.FANCY || graphicsStatus == GraphicsStatus.FABULOUS));
         }
+
+        public static class GraphicsQualityDeserializer implements JsonDeserializer<GraphicsQuality> {
+            @Override
+            public GraphicsQuality deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                if (json.isJsonPrimitive()) {
+                    return json.getAsBoolean() ? GraphicsQuality.FANCY : GraphicsQuality.FAST;
+                }
+                return GSON.fromJson(json, GraphicsQuality.class);
+            }
+        }
     }
 
     private static final Gson GSON = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .setPrettyPrinting()
             .excludeFieldsWithModifiers(Modifier.PRIVATE)
+            .registerTypeAdapter(GraphicsQuality.class, new GraphicsQuality.GraphicsQualityDeserializer())
             .create();
 
     public static SodiumGameOptions loadFromDisk() {

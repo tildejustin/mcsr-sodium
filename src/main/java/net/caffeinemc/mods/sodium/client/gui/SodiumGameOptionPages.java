@@ -217,10 +217,10 @@ public class SodiumGameOptionPages {
                         .setBinding((opts, value) -> opts.entityShadows().set(value), opts -> opts.entityShadows().get())
                         .setImpact(OptionImpact.MEDIUM)
                         .build())
-                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                .add(OptionImpl.createBuilder(SodiumGameOptions.GraphicsQuality.class, sodiumOpts)
                         .setName(Component.translatable("sodium.options.vignette.name"))
                         .setTooltip(Component.translatable("sodium.options.vignette.tooltip"))
-                        .setControl(TickBoxControl::new)
+                        .setControl(option -> new CyclingControl<>(option, SodiumGameOptions.GraphicsQuality.class, new Component[] { Component.translatable("options.gamma.default"), Component.translatable("options.off"), Component.translatable("options.on") }))
                         .setBinding((opts, value) -> opts.quality.enableVignette = value, opts -> opts.quality.enableVignette)
                         .build())
                 .build());
