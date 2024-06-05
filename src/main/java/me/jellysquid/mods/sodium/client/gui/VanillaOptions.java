@@ -1,7 +1,7 @@
 package me.jellysquid.mods.sodium.client.gui;
 
 import me.jellysquid.mods.sodium.client.gui.vanilla.builders.CycleOptionBuilder;
-import me.jellysquid.mods.sodium.client.gui.vanilla.options.EntityCulling;
+import me.jellysquid.mods.sodium.client.gui.vanilla.options.BooleanCyclingOption;
 import net.minecraft.client.options.Option;
 
 import java.util.HashSet;
@@ -24,12 +24,21 @@ public class VanillaOptions {
         DOUBLE_OPTIONS_RUNNABLE.add(apply);
     }
 
-    public static final Option ENTITY_CULLING = new CycleOptionBuilder<EntityCulling>()
+    public static final Option ENTITY_CULLING = new CycleOptionBuilder<BooleanCyclingOption>()
             .setKey("options.entityCulling")
             .setText("Entity Culling")
-            .setOptions(EntityCulling.values())
-            .setGetter((options) -> EntityCulling.getOption(options.advanced.useEntityCulling))
+            .setOptions(BooleanCyclingOption.values())
+            .setGetter((options) -> BooleanCyclingOption.getOption(options.advanced.useEntityCulling))
             .setSetter((options, value) -> options.advanced.useEntityCulling = value.isEnabled())
-            .setTextGetter(EntityCulling::getText)
+            .setTextGetter(BooleanCyclingOption::getText)
+            .build();
+
+    public static final Option FOG_OCCLUSION = new CycleOptionBuilder<BooleanCyclingOption>()
+            .setKey("options.fogOcclusion")
+            .setText("Fog Occlusion")
+            .setOptions(BooleanCyclingOption.values())
+            .setGetter(options -> BooleanCyclingOption.getOption(options.advanced.useFogOcclusion))
+            .setSetter((options, value) -> options.advanced.useFogOcclusion = value.isEnabled())
+            .setTextGetter(BooleanCyclingOption::getText)
             .build();
 }
