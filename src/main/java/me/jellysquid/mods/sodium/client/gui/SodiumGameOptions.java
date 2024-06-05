@@ -73,11 +73,7 @@ public class SodiumGameOptions {
             return this.supportedFunc.isSupported(disableBlacklist);
         }
 
-        public static class QualitySettings {
-        public boolean enableVignette = true;
-    }
-
-    public static ChunkRendererBackendOption[] getAvailableOptions(boolean disableBlacklist) {
+        public static ChunkRendererBackendOption[] getAvailableOptions(boolean disableBlacklist) {
             return streamAvailableOptions(disableBlacklist)
                     .toArray(ChunkRendererBackendOption[]::new);
         }
