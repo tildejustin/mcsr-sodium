@@ -53,7 +53,6 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
     @Redirect(method = "init", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonListWidget;addAll([Lnet/minecraft/client/options/Option;)V"))
     private void optionsSwap(ButtonListWidget list, Option[] old_options){
         list.addAll(OPTIONS);
-        VanillaOptions.clearSettingsChanges();
     }
 
     @Inject(method = "mouseReleased", at = @At("RETURN"))
