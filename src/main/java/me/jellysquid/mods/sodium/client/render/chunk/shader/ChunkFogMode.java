@@ -41,7 +41,7 @@ public enum ChunkFogMode {
 
         int mode = GL11.glGetInteger(GL11.GL_FOG_MODE);
 
-        boolean usePlanarFog = SodiumClientMod.options().unofficial.usePlanarFog;
+        boolean usePlanarFog = SodiumClientMod.options().speedrun.usePlanarFog;
 
         switch (mode) {
             case GL11.GL_EXP2:
