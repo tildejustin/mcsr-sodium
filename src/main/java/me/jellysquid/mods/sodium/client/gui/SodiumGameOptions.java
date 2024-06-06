@@ -47,6 +47,8 @@ public class SodiumGameOptions {
 
     public static class UnofficialSettings {
         public boolean usePlanarFog = false;
+        public boolean showEntityCulling = true;
+        public boolean showFogOcclusion = true;
     }
 
     public enum ChunkRendererBackendOption implements TextProvider {
