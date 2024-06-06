@@ -37,7 +37,7 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
     @Redirect(method = "init", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonListWidget;addAll([Lnet/minecraft/client/options/Option;)V"))
     private void optionsSwap(ButtonListWidget list, Option[] old_options) {
         List<Option> options =  new ArrayList<>(Arrays.asList(old_options));
-        SodiumGameOptions.UnofficialSettings speedrunSettings = SodiumClientMod.options().unofficial;
+        SodiumGameOptions.SpeedrunSettings speedrunSettings = SodiumClientMod.options().speedrun;
         if (speedrunSettings.showEntityCulling) {
             options.add(VanillaOptions.ENTITY_CULLING);
         }

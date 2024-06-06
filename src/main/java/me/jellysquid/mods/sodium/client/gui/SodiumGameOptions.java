@@ -22,7 +22,7 @@ import java.util.stream.Stream;
 public class SodiumGameOptions {
     public final QualitySettings quality = new QualitySettings();
     public final AdvancedSettings advanced = new AdvancedSettings();
-    public final UnofficialSettings unofficial = new UnofficialSettings();
+    public final SpeedrunSettings speedrun = new SpeedrunSettings();
 
     private File file;
 
@@ -46,7 +46,7 @@ public class SodiumGameOptions {
         public boolean enableVignette = true;
     }
 
-    public static class UnofficialSettings {
+    public static class SpeedrunSettings {
         public boolean usePlanarFog = true;
         public boolean showEntityCulling = true;
         public boolean showFogOcclusion = true;
