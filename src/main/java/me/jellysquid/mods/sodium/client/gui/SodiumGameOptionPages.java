@@ -324,6 +324,20 @@ public class SodiumGameOptionPages {
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
                         .build()
                 )
+                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                        .setName("Show Entity Culling")
+                        .setTooltip("If enabled, Entity Culling will be added to the vanilla menu so it can be toggled while in a world.")
+                        .setControl(TickBoxControl::new)
+                        .setBinding((opts, value) -> opts.unofficial.showEntityCulling = value, opts -> opts.unofficial.showEntityCulling)
+                        .build()
+                )
+                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                        .setName("Show Fog Occlusion")
+                        .setTooltip("If enabled, Fog Occlusion will be added to the vanilla menu so it can be toggled while in a world.")
+                        .setControl(TickBoxControl::new)
+                        .setBinding((opts, value) -> opts.unofficial.showFogOcclusion = value, opts -> opts.unofficial.showFogOcclusion)
+                        .build()
+                )
                 .build());
         return new OptionPage("Unofficial", ImmutableList.copyOf(groups));
     }
