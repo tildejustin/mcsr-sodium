@@ -49,6 +49,8 @@ public class SodiumGameOptions {
 
     public static class SpeedrunSettings {
         public boolean usePlanarFog = true;
+        public boolean showEntityCulling = true;
+        public boolean showFogOcclusion = true;
     }
 
     private static final Gson GSON = new GsonBuilder()
