@@ -1,6 +1,7 @@
 package me.jellysquid.mods.sodium.mixin.features.options;
 
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
+import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
 import me.jellysquid.mods.sodium.client.gui.VanillaOptions;
 import me.jellysquid.mods.sodium.client.gui.options.OptionFlag;
@@ -21,7 +22,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 @Mixin(VideoOptionsScreen.class)
@@ -31,29 +34,17 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
         super(parent, gameOptions, title);
     }
 
-    private static final Option[] OPTIONS = {
-            Option.GRAPHICS,
-            Option.RENDER_DISTANCE,
-            Option.AO,
-            Option.FRAMERATE_LIMIT,
-            Option.VSYNC,
-            Option.VIEW_BOBBING,
-            Option.GUI_SCALE,
-            Option.ATTACK_INDICATOR,
-            Option.GAMMA,
-            Option.CLOUDS,
-            Option.FULLSCREEN,
-            Option.PARTICLES,
-            Option.MIPMAP_LEVELS,
-            Option.ENTITY_SHADOWS,
-            Option.ENTITY_DISTANCE_SCALING,
-            VanillaOptions.ENTITY_CULLING
-    };
-
     @Redirect(method = "init", at=@At(value = "INVOKE", target = "Lnet/minecraft/client/gui/widget/ButtonListWidget;addAll([Lnet/minecraft/client/options/Option;)V"))
-    private void optionsSwap(ButtonListWidget list, Option[] old_options){
-        list.addAll(OPTIONS);
-        VanillaOptions.clearSettingsChanges();
+    private void optionsSwap(ButtonListWidget list, Option[] old_options) {
+        List<Option> options =  new ArrayList<>(Arrays.asList(old_options));
+        SodiumGameOptions.SpeedrunSettings speedrunSettings = SodiumClientMod.options().speedrun;
+        if (speedrunSettings.showEntityCulling) {
+            options.add(VanillaOptions.ENTITY_CULLING);
+        }
+        if (speedrunSettings.showFogOcclusion) {
+            options.add(VanillaOptions.FOG_OCCLUSION);
+        }
+        list.addAll(options.toArray(new Option[0]));
     }
 
     @Inject(method = "mouseReleased", at = @At("RETURN"))

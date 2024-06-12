@@ -210,7 +210,6 @@ public class SodiumGameOptionPages {
 
     public static OptionPage advanced() {
         boolean disableBlacklist = SodiumClientMod.options().advanced.disableDriverBlacklist;
-        boolean usePlanarFog = SodiumClientMod.options().unofficial.usePlanarFog;
 
         List<OptionGroup> groups = new ArrayList<>();
 
@@ -328,9 +327,23 @@ public class SodiumGameOptionPages {
                                 "in areas with thick fog such as in the nether. This is vanilla behavior on systems where GL_NV_fog_distance is unavailable, but is not " +
                                 "considered desirable for any reason other than visibility. This option is not included in official releases of Sodium.")
                         .setControl(TickBoxControl::new)
-                        .setBinding((opts, value) -> opts.unofficial.usePlanarFog = value, opts -> opts.unofficial.usePlanarFog)
+                        .setBinding((opts, value) -> opts.speedrun.usePlanarFog = value, opts -> opts.speedrun.usePlanarFog)
                         .setImpact(OptionImpact.MEDIUM)
                         .setFlags(OptionFlag.REQUIRES_RENDERER_RELOAD)
+                        .build()
+                )
+                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                        .setName("Show Entity Culling")
+                        .setTooltip("If enabled, Entity Culling will be added to the vanilla menu so it can be toggled while in a world.")
+                        .setControl(TickBoxControl::new)
+                        .setBinding((opts, value) -> opts.speedrun.showEntityCulling = value, opts -> opts.speedrun.showEntityCulling)
+                        .build()
+                )
+                .add(OptionImpl.createBuilder(boolean.class, sodiumOpts)
+                        .setName("Show Fog Occlusion")
+                        .setTooltip("If enabled, Fog Occlusion will be added to the vanilla menu so it can be toggled while in a world.")
+                        .setControl(TickBoxControl::new)
+                        .setBinding((opts, value) -> opts.speedrun.showFogOcclusion = value, opts -> opts.speedrun.showFogOcclusion)
                         .build()
                 )
                 .build());
