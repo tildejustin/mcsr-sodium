@@ -1,5 +1,6 @@
 plugins {
-    id 'fabric-loom' version '1.5-SNAPSHOT'
+    id "fabric-loom" version "1.5-SNAPSHOT"
+    id "maven-publish"
 }
 
 archivesBaseName = project.mod_id
@@ -38,8 +39,16 @@ java {
     toolchain {
         languageVersion = JavaLanguageVersion.of(8)
     }
+    withSourcesJar()
 }
 
 jar {
     from "LICENSE.txt"
+}
+
+publishing {
+    publications.create("mavenJava", MavenPublication) {
+        from components.java
+    }
+    repositories {}
 }
