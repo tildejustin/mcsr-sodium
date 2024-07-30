@@ -1,100 +1,67 @@
 package me.jellysquid.mods.sodium.client.gui;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
+import me.jellysquid.mods.sodium.client.render.chunk.backends.multidraw.MultidrawChunkRenderBackend;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.WorldRenderer;
+import org.mcsr.speedrunapi.config.api.SpeedrunConfig;
+import org.mcsr.speedrunapi.config.api.SpeedrunConfigStorage;
+import org.mcsr.speedrunapi.config.api.annotations.Config;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.reflect.Modifier;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
-
-public class SodiumGameOptions {
+public class SodiumGameOptions implements SpeedrunConfig {
+    @Config.Category("quality")
     public final QualitySettings quality = new QualitySettings();
+
+    @Config.Category("advanced")
     public final AdvancedSettings advanced = new AdvancedSettings();
-    public final NotificationSettings notifications = new NotificationSettings();
+
+    @Config.Category("speedrun")
     public final SpeedrunSettings speedrun = new SpeedrunSettings();
 
-    private Path configPath;
-
-    public void notifyListeners() {
-        SodiumClientMod.onConfigChanged(this);
-    }
-
-    public static class AdvancedSettings {
-        public boolean useVertexArrayObjects = true;
+    public static class AdvancedSettings implements SpeedrunConfigStorage {
         public boolean useChunkMultidraw = true;
-
-        public boolean animateOnlyVisibleTextures = true;
+        public boolean useVertexArrayObjects = true;
+        public boolean useBlockFaceCulling = true;
+        public boolean useCompactVertexFormat = true;
+        public boolean useFogOcclusion = true;
         public boolean useEntityCulling = false;
         public boolean useParticleCulling = true;
-        public boolean useFogOcclusion = true;
-        public boolean useCompactVertexFormat = true;
-        public boolean useBlockFaceCulling = true;
+        public boolean animateOnlyVisibleTextures = true;
         public boolean allowDirectMemoryAccess = true;
         public boolean ignoreDriverBlacklist = false;
     }
 
-    public static class QualitySettings {
-        public boolean enableVignette = true;
+    public static class QualitySettings implements SpeedrunConfigStorage {
+        public boolean enableVignette = false;
     }
 
-    public static class NotificationSettings {
-        public boolean hideDonationButton = false;
-    }
-
-    public static class SpeedrunSettings {
+    public static class SpeedrunSettings implements SpeedrunConfigStorage {
         public boolean usePlanarFog = true;
         public boolean showEntityCulling = true;
         public boolean showFogOcclusion = true;
     }
 
-    private static final Gson GSON = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .setPrettyPrinting()
-            .excludeFieldsWithModifiers(Modifier.PRIVATE)
-            .create();
-
-    public static SodiumGameOptions load(Path path) {
-        SodiumGameOptions config = null;
-
-        boolean exists = Files.exists(path);
-        if (exists) {
-            try (FileReader reader = new FileReader(path.toFile())) {
-                config = GSON.fromJson(reader, SodiumGameOptions.class);
-            } catch (IOException | JsonSyntaxException e) {
-                SodiumClientMod.logger().warn("Could not parse config, falling back to default");
-            }
-        }
-        if (!exists || config == null) {
-            config = new SodiumGameOptions();
-        }
-
-        config.configPath = path;
-
-        try {
-            config.writeChanges();
-        } catch (IOException e) {
-            throw new RuntimeException("Couldn't update config file", e);
-        }
-
-        return config;
+    {
+        SodiumClientMod.CONFIG = this;
     }
 
-    public void writeChanges() throws IOException {
-        Path dir = this.configPath.getParent();
+    @Override
+    public void finishSaving() {
+        SodiumClientMod.onConfigChanged(this);
+        WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
+        if (worldRenderer != null) worldRenderer.reload();
+    }
 
-        if (!Files.exists(dir)) {
-            Files.createDirectories(dir);
-        } else if (!Files.isDirectory(dir)) {
-            throw new IOException("Not a directory: " + dir);
+    @Override
+    public String modID() {
+        return "sodium";
+    }
+
+    @Override
+    public boolean shouldShowOption(String option) {
+        if (option.equals("useChunkMultidraw")) {
+            return MultidrawChunkRenderBackend.isSupported(this.advanced.ignoreDriverBlacklist);
         }
-
-        Files.write(this.configPath, GSON.toJson(this)
-                .getBytes(StandardCharsets.UTF_8));
+        return SpeedrunConfig.super.shouldShowOption(option);
     }
 }
