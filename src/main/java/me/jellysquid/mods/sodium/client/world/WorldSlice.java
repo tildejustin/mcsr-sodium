@@ -6,6 +6,7 @@ import me.jellysquid.mods.sodium.client.world.biome.BiomeCache;
 import me.jellysquid.mods.sodium.client.world.biome.BiomeCacheManager;
 import me.jellysquid.mods.sodium.client.world.biome.BiomeColorCache;
 import me.jellysquid.mods.sodium.common.util.pool.ReusableObject;
+import me.jellysquid.mods.sodium.mixin.core.accessor.PalettedContainerAccessor;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.fluid.FluidState;
@@ -232,8 +233,8 @@ public class WorldSlice extends ReusableObject implements BlockRenderView, Biome
 
         PalettedContainer<BlockState> container = section.getContainer();
 
-        PackedIntegerArray intArray = container.data;
-        Palette<BlockState> palette = container.palette;
+        PackedIntegerArray intArray = ((PalettedContainerAccessor) container).getData();
+        Palette<BlockState> palette = ((PalettedContainerAccessor) container).getPalette();
 
         BlockState[] dst = this.blockStatesArrays[sectionIdx];
 
