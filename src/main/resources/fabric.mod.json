@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "id": "${mod_id}",
+  "id": "sodiummac",
   "version": "${version}",
   "name": "Sodium Mac",
   "description": "Sodium is a free and open-source optimization mod for Minecraft which improves frame rates and reduces lag spikes. \nThis is an unofficial backport of JellySquid's original mod.",
