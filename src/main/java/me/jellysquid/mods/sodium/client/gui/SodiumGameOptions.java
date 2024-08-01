@@ -20,7 +20,6 @@ public class SodiumGameOptions implements SpeedrunConfig {
 
     public static class AdvancedSettings implements SpeedrunConfigStorage {
         public boolean useChunkMultidraw = true;
-        public boolean useVertexArrayObjects = true;
         public boolean useBlockFaceCulling = true;
         public boolean useCompactVertexFormat = true;
         public boolean useFogOcclusion = true;
