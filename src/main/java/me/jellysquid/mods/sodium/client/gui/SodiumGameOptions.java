@@ -26,7 +26,6 @@ public class SodiumGameOptions {
     }
 
     public static class AdvancedSettings {
-        public boolean useVertexArrayObjects = true;
         public boolean useChunkMultidraw = true;
 
         public boolean animateOnlyVisibleTextures = true;

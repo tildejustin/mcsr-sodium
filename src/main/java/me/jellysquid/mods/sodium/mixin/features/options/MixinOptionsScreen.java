@@ -1,7 +1,7 @@
 package me.jellysquid.mods.sodium.mixin.features.options;
 
-import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumOptionsGUI;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.gui.screen.VideoOptionsScreen;
@@ -24,7 +24,7 @@ public class MixinOptionsScreen extends Screen {
     @Inject(method = "method_19828(Lnet/minecraft/client/gui/widget/ButtonWidget;)V", at = @At("HEAD"), cancellable = true)
     private void open(ButtonWidget widget, CallbackInfo ci) {
         if (this.client != null) {
-            if (MinecraftClient.getInstance().world != null) {
+            if (MinecraftClient.getInstance().world != null || FabricLoader.getInstance().isModLoaded("speedrunapi")) {
                 this.client.openScreen(new VideoOptionsScreen(this, MinecraftClient.getInstance().options));
             } else {
                 this.client.openScreen(new SodiumOptionsGUI(this));
