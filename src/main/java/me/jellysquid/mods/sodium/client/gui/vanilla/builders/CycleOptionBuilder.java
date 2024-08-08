@@ -1,5 +1,6 @@
 package me.jellysquid.mods.sodium.client.gui.vanilla.builders;
 
+import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
 import me.jellysquid.mods.sodium.client.gui.vanilla.option.CyclingOption;
 import me.jellysquid.mods.sodium.client.gui.vanilla.options.IndexedOption;
@@ -34,7 +35,7 @@ public class CycleOptionBuilder<V extends IndexedOption> extends OptionBuilder<C
         BiFunction<SodiumGameOptions, CyclingOption<V>, Text> textGetter = getTextGetter();
         return new CyclingOption<>(
                 getKey(),
-                sodiumOpts.getData(),
+                SodiumClientMod.options(),
                 getOptions(),
                 getSetter(),
                 getGetter(),
