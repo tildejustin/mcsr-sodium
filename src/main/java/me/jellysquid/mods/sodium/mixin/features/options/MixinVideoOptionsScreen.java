@@ -10,6 +10,7 @@ import net.minecraft.client.gui.widget.ButtonListWidget;
 import net.minecraft.client.options.GameOptions;
 import net.minecraft.client.options.Option;
 import net.minecraft.text.Text;
+import org.lwjgl.glfw.GLFW;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -52,5 +53,14 @@ public class MixinVideoOptionsScreen extends GameOptionsScreen {
         boolean result = super.keyReleased(keyCode, scanCode, modifiers);
         VanillaOptions.applySettingsChanges();
         return result;
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        if (keyCode == GLFW.GLFW_KEY_ESCAPE) {
+            VanillaOptions.applySettingsChanges();
+        }
+
+        return super.keyPressed(keyCode, scanCode, modifiers);
     }
 }
