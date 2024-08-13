@@ -1,7 +1,6 @@
 package me.jellysquid.mods.sodium.client.gui.vanilla.option;
 
 import me.jellysquid.mods.sodium.client.gui.SodiumGameOptions;
-import me.jellysquid.mods.sodium.client.gui.options.storage.SodiumOptionsStorage;
 import me.jellysquid.mods.sodium.client.gui.vanilla.options.IndexedOption;
 import net.minecraft.client.gui.widget.AbstractButtonWidget;
 import net.minecraft.client.gui.widget.OptionButtonWidget;

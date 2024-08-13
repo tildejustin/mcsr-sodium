@@ -1,75 +1,69 @@
 package me.jellysquid.mods.sodium.client.gui;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonSyntaxException;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
-import me.jellysquid.mods.sodium.client.gui.options.TextProvider;
 import me.jellysquid.mods.sodium.client.render.chunk.backends.gl20.GL20ChunkRenderBackend;
 import me.jellysquid.mods.sodium.client.render.chunk.backends.gl30.GL30ChunkRenderBackend;
 import me.jellysquid.mods.sodium.client.render.chunk.backends.gl43.GL43ChunkRenderBackend;
-import net.minecraft.client.options.GraphicsMode;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.render.WorldRenderer;
+import net.minecraft.text.LiteralText;
+import org.jetbrains.annotations.Nullable;
+import org.mcsr.speedrunapi.config.SpeedrunConfigAPI;
+import org.mcsr.speedrunapi.config.api.SpeedrunConfig;
+import org.mcsr.speedrunapi.config.api.SpeedrunConfigStorage;
+import org.mcsr.speedrunapi.config.api.SpeedrunOption;
+import org.mcsr.speedrunapi.config.api.annotations.Config;
+import org.mcsr.speedrunapi.config.api.annotations.InitializeOn;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
-public class SodiumGameOptions {
+@InitializeOn(InitializeOn.InitPoint.POSTLAUNCH)
+public class SodiumGameOptions implements SpeedrunConfig {
+    @Config.Category("quality")
     public final QualitySettings quality = new QualitySettings();
+
+    @Config.Category("advanced")
     public final AdvancedSettings advanced = new AdvancedSettings();
+
+    @Config.Category("speedrun")
     public final SpeedrunSettings speedrun = new SpeedrunSettings();
 
-    private File file;
-
-    public void notifyListeners() {
-        SodiumClientMod.onConfigChanged(this);
-    }
-
-    public static class AdvancedSettings {
+    public static class AdvancedSettings implements SpeedrunConfigStorage {
         public ChunkRendererBackendOption chunkRendererBackend = ChunkRendererBackendOption.BEST;
-        public boolean animateOnlyVisibleTextures = true;
+        public boolean useChunkFaceCulling = true;
+        public boolean useCompactVertexFormat = true;
+        public boolean useFogOcclusion = true;
         public boolean useEntityCulling = false;
         public boolean useParticleCulling = true;
-        public boolean useFogOcclusion = true;
-        public boolean useCompactVertexFormat = true;
-        public boolean useChunkFaceCulling = true;
+        public boolean animateOnlyVisibleTextures = true;
         public boolean useMemoryIntrinsics = true;
         public boolean disableDriverBlacklist = false;
     }
 
-    public static class QualitySettings {
-        public boolean enableVignette = true;
+    public static class QualitySettings implements SpeedrunConfigStorage {
+        public boolean enableVignette = false;
     }
 
-    public static class SpeedrunSettings {
+    public static class SpeedrunSettings implements SpeedrunConfigStorage {
         public boolean usePlanarFog = true;
         public boolean showEntityCulling = true;
         public boolean showFogOcclusion = true;
     }
 
-    public enum ChunkRendererBackendOption implements TextProvider {
-        GL43("Multidraw (GL 4.3)", GL43ChunkRenderBackend::isSupported),
-        GL30("Oneshot (GL 3.0)", GL30ChunkRenderBackend::isSupported),
-        GL20("Oneshot (GL 2.0)", GL20ChunkRenderBackend::isSupported);
+    public enum ChunkRendererBackendOption {
+        GL43(GL43ChunkRenderBackend::isSupported),
+        GL30(GL30ChunkRenderBackend::isSupported),
+        GL20(GL20ChunkRenderBackend::isSupported);
 
         public static final ChunkRendererBackendOption BEST = pickBestBackend();
 
-        private final String name;
         private final SupportCheck supportedFunc;
 
-        ChunkRendererBackendOption(String name, SupportCheck supportedFunc) {
-            this.name = name;
+        ChunkRendererBackendOption(SupportCheck supportedFunc) {
             this.supportedFunc = supportedFunc;
-        }
-
-        @Override
-        public String getLocalizedName() {
-            return this.name;
         }
 
         public boolean isSupported(boolean disableBlacklist) {
@@ -97,93 +91,40 @@ public class SodiumGameOptions {
         }
     }
 
-    public enum GraphicsQuality implements TextProvider {
-        DEFAULT("Default"),
-        FANCY("Fancy"),
-        FAST("Fast");
-
-        private final String name;
-
-        GraphicsQuality(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getLocalizedName() {
-            return this.name;
-        }
-
-        public boolean isFancy(GraphicsMode graphicsMode) {
-            return (this == FANCY) || (this == DEFAULT && (graphicsMode == GraphicsMode.FANCY || graphicsMode == GraphicsMode.FABULOUS));
-        }
+    {
+        SodiumClientMod.CONFIG = this;
     }
 
-    public enum LightingQuality implements TextProvider {
-        HIGH("High"),
-        LOW("Low"),
-        OFF("Off");
-
-        private final String name;
-
-        LightingQuality(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String getLocalizedName() {
-            return this.name;
-        }
+    @Override
+    public void finishSaving() {
+        SodiumClientMod.onConfigChanged(this);
+        WorldRenderer worldRenderer = MinecraftClient.getInstance().worldRenderer;
+        if (worldRenderer != null) worldRenderer.reload();
     }
 
-    private static final Gson gson = new GsonBuilder()
-            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-            .setPrettyPrinting()
-            .excludeFieldsWithModifiers(Modifier.PRIVATE)
-            .create();
-
-    public static SodiumGameOptions load(File file) {
-        SodiumGameOptions config = null;
-
-        boolean exists = file.exists();
-        if (exists) {
-            try (FileReader reader = new FileReader(file)) {
-                config = gson.fromJson(reader, SodiumGameOptions.class);
-            } catch (IOException | JsonSyntaxException e) {
-                SodiumClientMod.logger().warn("Could not parse config, falling back to default");
-            }
-        }
-        if (!exists || config == null) {
-            config = new SodiumGameOptions();
-        }
-
-        config.sanitize();
-        config.file = file;
-        config.writeChanges();
-
-        return config;
+    @Override
+    public String modID() {
+        return "sodiummac";
     }
 
-    private void sanitize() {
-        if (this.advanced.chunkRendererBackend == null) {
-            this.advanced.chunkRendererBackend = ChunkRendererBackendOption.BEST;
+    @Override
+    public @Nullable SpeedrunOption<?> parseField(Field field, SpeedrunConfig config, String... idPrefix) {
+        if (ChunkRendererBackendOption.class.equals(field.getType())) {
+            return new SpeedrunConfigAPI.CustomOption.Builder<ChunkRendererBackendOption>(this, this, field, idPrefix)
+                    .createWidget((option, innerConfig, configStorage, optionField) -> new ButtonWidget(0, 0, 150, 20, option.getText(), button -> {
+                        ChunkRendererBackendOption[] options = ChunkRendererBackendOption.getAvailableOptions(SodiumClientMod.options().advanced.disableDriverBlacklist);
+                        ChunkRendererBackendOption current = option.get();
+                        int index = -1;
+                        for (int i = 0; i < options.length; ++i) {
+                            if (options[i].equals(current)) {
+                                index = i;
+                            }
+                        }
+                        option.set(options[(index + 1) % options.length]);
+                        button.setMessage(option.getText());
+                    }))
+                    .build();
         }
-    }
-
-    public void writeChanges() {
-        File dir = this.file.getParentFile();
-
-        if (!dir.exists()) {
-            if (!dir.mkdirs()) {
-                throw new RuntimeException("Could not create parent directories");
-            }
-        } else if (!dir.isDirectory()) {
-            throw new RuntimeException("The parent file is not a directory");
-        }
-
-        try (FileWriter writer = new FileWriter(this.file)) {
-            gson.toJson(this, writer);
-        } catch (IOException e) {
-            throw new RuntimeException("Could not save configuration file", e);
-        }
+        return SpeedrunConfig.super.parseField(field, config, idPrefix);
     }
 }

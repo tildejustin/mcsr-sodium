@@ -1,14 +1,23 @@
 {
-  "schemaVersion": 1,
-  "id": "sodiummac",
+    "schemaVersion": 1,
+    "id": "sodiummac",
   "version": "${version}",
   "name": "Sodium Mac",
-  "description": "Sodium is a free and open-source optimization mod for Minecraft which improves frame rates and reduces lag spikes. \nThis is an unofficial backport of JellySquid's original mod.",
-  "authors": [
-    "jellysquid3",
-    "MrMangoHands",
-    "jan-leila",
-    "RedLime"
+    "description": "Sodium is a free and open-source optimization mod for Minecraft which improves frame rates and reduces lag spikes. \nThis is an unofficial backport of JellySquid's original mod.",
+    "authors": [
+        {
+            "name": "jellysquid3",
+            "contact": {
+                "homepage": "https://github.com/jellysquid3"
+            }
+        }
+    ],
+    "contributors": [
+        "MrMangoHands",
+        "jan-leila",
+        "RedLime",
+        "Slackow",
+        "tildejustin"
   ],
   "contact": {
     "homepage": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium",
@@ -24,19 +33,22 @@
     ]
   },
   "custom": {
-    "fabric-renderer-api-v1:contains_renderer": true
-  },
-  "accessWidener": "sodium.accesswidener",
-  "mixins": [
-    "sodium.mixins.json"
-  ],
-  "depends": {
-    "fabricloader": ">=0.8.0"
-  },
-  "breaks": {
-    "optifabric": "*",
-    "canvas": "*"
-  },
+    "fabric-renderer-api-v1:contains_renderer": true,
+        "speedrunapi": {
+            "config": "me.jellysquid.mods.sodium.client.gui.SodiumGameOptions"
+        }
+    },
+    "accessWidener": "sodium.accesswidener",
+    "mixins": [
+        "sodium.mixins.json"
+    ],
+    "depends": {
+        "fabricloader": ">=0.8.0"
+    },
+    "breaks": {
+        "optifabric": "*",
+        "canvas": "*"
+    },
   "provides": [
     "sodium"
   ]
