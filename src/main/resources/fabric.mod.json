@@ -1,8 +1,8 @@
 {
     "schemaVersion": 1,
     "id": "sodiummac",
-  "version": "${version}",
-  "name": "Sodium Mac",
+    "version": "${version}",
+    "name": "Sodium Mac",
     "description": "Sodium is a free and open-source optimization mod for Minecraft which improves frame rates and reduces lag spikes. \nThis is an unofficial backport of JellySquid's original mod.",
     "authors": [
         {
@@ -18,22 +18,22 @@
         "RedLime",
         "Slackow",
         "tildejustin"
-  ],
-  "contact": {
-    "homepage": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium",
-    "issues": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium/issues",
-    "sources": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium"
-  },
-  "license": "LGPL-3.0-only",
-  "icon": "assets/sodium/icon.png",
-  "environment": "client",
-  "entrypoints": {
-    "client": [
-      "me.jellysquid.mods.sodium.client.SodiumClientMod"
-    ]
-  },
-  "custom": {
-    "fabric-renderer-api-v1:contains_renderer": true,
+    ],
+    "contact": {
+        "homepage": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium",
+        "issues": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium/issues",
+        "sources": "https://github.com/Minecraft-Java-Edition-Speedrunning/sodium"
+    },
+    "license": "LGPL-3.0-only",
+    "icon": "assets/sodium/icon.png",
+    "environment": "client",
+    "entrypoints": {
+        "client": [
+            "me.jellysquid.mods.sodium.client.SodiumClientMod"
+        ]
+    },
+    "custom": {
+        "fabric-renderer-api-v1:contains_renderer": true,
         "speedrunapi": {
             "config": "me.jellysquid.mods.sodium.client.gui.SodiumGameOptions"
         }
@@ -50,7 +50,7 @@
         "optifabric": "*",
         "canvas": "*"
     },
-  "provides": [
-    "sodium"
-  ]
+    "provides": [
+        "sodium"
+    ]
 }

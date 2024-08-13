@@ -10,24 +10,24 @@ base {
     archivesName = archives_name
 }
 
-repositories {
-    maven { url "https://jitpack.io" }
-}
-
 loom {
     accessWidenerPath = file("src/main/resources/sodium.accesswidener")
 }
 
+repositories {
+    maven { url "https://jitpack.io" }
+}
+
 dependencies {
-    minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "dev.tildejustin:yarn:${project.yarn_mappings}:v2"
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    minecraft "com.mojang:minecraft:$minecraft_version"
+    mappings "dev.tildejustin:yarn:$yarn_mappings:v2"
+    modImplementation "net.fabricmc:fabric-loader:$loader_version"
     modImplementation "com.github.kingcontaria:speedrunapi:$speedrunapi_version"
 }
 
 processResources {
-    filesMatching "fabric.mod.json", {
-        expand "version": version
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 
@@ -37,9 +37,7 @@ tasks.withType(JavaCompile).configureEach {
 
 java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(8)
-    }
+    toolchain { languageVersion = JavaLanguageVersion.of(8) }
     withSourcesJar()
 }
 
