@@ -28,17 +28,14 @@ import me.jellysquid.mods.sodium.client.render.chunk.passes.BlockRenderPass;
 import me.jellysquid.mods.sodium.client.render.chunk.region.ChunkRegion;
 import me.jellysquid.mods.sodium.client.render.chunk.region.ChunkRegionManager;
 import net.minecraft.util.Util;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL15;
-import org.lwjgl.opengl.GL20;
-import org.lwjgl.opengl.GL40;
+import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.*;
+import org.lwjgl.system.MemoryUtil;
 
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Shader-based chunk renderer which makes use of a custom memory allocator on top of large buffer objects to allow
@@ -369,6 +366,13 @@ public class GL43ChunkRenderBackend extends ChunkRenderBackendMultiDraw<LCBGraph
         // The open-source drivers on Linux are not known to have driver bugs with multi-draw
         if (Util.getOperatingSystem() != Util.OperatingSystem.WINDOWS) {
             return false;
+        }
+
+        if (GLFW.glfwInit()) {
+            GLFW.glfwWindowHint(GLFW.GLFW_VISIBLE, GLFW.GLFW_FALSE);
+            long testwindow = GLFW.glfwCreateWindow(1, 1, "", MemoryUtil.NULL, MemoryUtil.NULL);
+            GLFW.glfwMakeContextCurrent(testwindow);
+            GL.createCapabilities();
         }
 
         String vendor = Objects.requireNonNull(GL11.glGetString(GL11.GL_VENDOR));
