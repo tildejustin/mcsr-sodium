@@ -29,5 +29,7 @@
     "speedrunapi.config.sodium.option.speedrun:showEntityCulling": "Show Entity Culling",
     "speedrunapi.config.sodium.option.speedrun:showEntityCulling.description": "If enabled, Entity Culling will be added to the vanilla menu so it can be toggled while in a world.",
     "speedrunapi.config.sodium.option.speedrun:showFogOcclusion": "Show Fog Occlusion",
-    "speedrunapi.config.sodium.option.speedrun:showFogOcclusion.description": "If enabled, Fog Occlusion will be added to the vanilla menu so it can be toggled while in a world."
+    "speedrunapi.config.sodium.option.speedrun:showFogOcclusion.description": "If enabled, Fog Occlusion will be added to the vanilla menu so it can be toggled while in a world.",
+    "speedrunapi.config.sodium.option.speedrun:renderThreads": "Render Threads",
+    "speedrunapi.config.sodium.option.speedrun:renderThreads.description": "How many render threads to create (lower = less F3+F lag)"
 }
