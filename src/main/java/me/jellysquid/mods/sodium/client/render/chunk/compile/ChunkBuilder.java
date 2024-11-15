@@ -18,6 +18,7 @@ import me.jellysquid.mods.sodium.client.world.cloned.ClonedChunkSectionCache;
 import me.jellysquid.mods.sodium.common.util.collections.DequeDrain;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.util.math.Vector3d;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
 import org.apache.logging.log4j.LogManager;
@@ -58,7 +59,24 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend) {
         this.vertexType = vertexType;
         this.backend = backend;
-        this.limitThreads = SodiumClientMod.options().speedrun.renderThreads;
+        this.limitThreads = getThreadCount();
+    }
+
+    /**
+     * Returns the "optimal" number of threads to be used for chunk build tasks. This will always return at least one
+     * thread.
+     */
+    private static int getOptimalThreadCount() {
+        return MathHelper.clamp(Math.max(getMaxThreadCount() / 3, getMaxThreadCount() - 6), 1, 10);
+    }
+
+    private static int getThreadCount() {
+        int requested = SodiumClientMod.options().speedrun.renderThreads;
+        return requested == 0 ? getOptimalThreadCount() : Math.min(requested, getMaxThreadCount());
+    }
+
+    private static int getMaxThreadCount() {
+        return Runtime.getRuntime().availableProcessors();
     }
 
     /**
@@ -200,14 +218,6 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         this.sectionCache = new ClonedChunkSectionCache(this.world);
 
         this.startWorkers();
-    }
-
-    /**
-     * Returns the "optimal" number of threads to be used for chunk build tasks. This is always at least one thread,
-     * but can be up to the number of available processor threads on the system.
-     */
-    private static int getOptimalThreadCount() {
-        return Math.max(1, Runtime.getRuntime().availableProcessors());
     }
 
     /**

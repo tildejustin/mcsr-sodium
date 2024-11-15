@@ -39,8 +39,8 @@ public class SodiumGameOptions implements SpeedrunConfig {
         public boolean showEntityCulling = true;
         public boolean showFogOcclusion = true;
 
-        @Config.Numbers.Whole.Bounds(min = 1, max = 32)
-        public int renderThreads = 1;
+        @Config.Numbers.Whole.Bounds(min = 0, max = 32)
+        public int renderThreads = 0;
     }
 
     {
