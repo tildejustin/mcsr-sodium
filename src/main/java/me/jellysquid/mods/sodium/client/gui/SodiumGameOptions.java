@@ -19,6 +19,8 @@ public class SodiumGameOptions implements SpeedrunConfig {
     public final SpeedrunSettings speedrun = new SpeedrunSettings();
 
     public static class AdvancedSettings implements SpeedrunConfigStorage {
+        @Config.Numbers.Whole.Bounds(min = 0, max = 32)
+        public int chunkUpdateThreads = 0;
         public boolean useChunkMultidraw = true;
         public boolean useBlockFaceCulling = true;
         public boolean useCompactVertexFormat = true;
@@ -38,9 +40,6 @@ public class SodiumGameOptions implements SpeedrunConfig {
         public boolean usePlanarFog = true;
         public boolean showEntityCulling = true;
         public boolean showFogOcclusion = true;
-
-        @Config.Numbers.Whole.Bounds(min = 0, max = 32)
-        public int renderThreads = 0;
     }
 
     {

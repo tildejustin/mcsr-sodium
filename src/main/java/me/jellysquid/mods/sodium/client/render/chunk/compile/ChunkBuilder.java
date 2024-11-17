@@ -71,7 +71,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     }
 
     private static int getThreadCount() {
-        int requested = SodiumClientMod.options().speedrun.renderThreads;
+        int requested = SodiumClientMod.options().advanced.chunkUpdateThreads;
         return requested == 0 ? getOptimalThreadCount() : Math.min(requested, getMaxThreadCount());
     }
 
