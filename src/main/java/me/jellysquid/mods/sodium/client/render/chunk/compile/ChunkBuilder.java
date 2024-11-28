@@ -65,11 +65,11 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     // actual count is optimal for a specific user and use case.
     private final int hardLimitThreads;
     // This is the initial time when this builder is created. We use this to create more threads.
-    private final float initialTime;
+    private long initialTime;
     // This is the user-configurable time delta to create a new thread, up until targetThreads.
-    private final float quickThreadCreationInterval;
+    private final long quickThreadCreationInterval;
     // This is the user-configurable time delta to create a new thread, up until hardLimitThreads.
-    private final float slowThreadCreationInterval;
+    private final long slowThreadCreationInterval;
 
     private final ChunkVertexType vertexType;
     private final ChunkRenderBackend<T> backend;
@@ -133,6 +133,12 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         thread.start();
 
         this.threads.add(thread);
+
+        // Helper debug message. Prints at most once per reload, so shouldn't noticeably increase log spam.
+        if (this.threads.size() == this.hardLimitThreads)
+        {
+            LOGGER.info("Reached maximum Sodium builder threads of {}", this.hardLimitThreads);
+        }
     }
 
     /**
@@ -160,7 +166,27 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
      * Spawns workers if we have thread space.
      */
     public void createMoreThreads() {
+        if (this.threads.size() >= this.hardLimitThreads) { return; }
 
+        long currentTime = currentTimeMillis();
+        long timeDelta = currentTime - this.initialTime;
+        if (this.threads.size() < this.targetThreads)
+        {
+            // Check if enough time has elapsed for us to create a target thread.
+            if (timeDelta > this.quickThreadCreationInterval)
+            {
+                this.createWorker(MinecraftClient.getInstance());
+                this.initialTime = currentTime;
+            }
+            // Not enough time has passed. There's no reason to check for the slower interval, so return.
+            return;
+        }
+        // Check if enough time has elapsed for us to create a target thread.
+        if (timeDelta > this.slowThreadCreationInterval)
+        {
+            this.createWorker(MinecraftClient.getInstance());
+            this.initialTime = currentTime;
+        }
     }
 
     /**

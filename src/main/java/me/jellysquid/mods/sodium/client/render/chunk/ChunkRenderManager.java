@@ -102,7 +102,7 @@ public class ChunkRenderManager<T extends ChunkGraphicsState> implements ChunkSt
         this.renderer = renderer;
         this.world = world;
 
-        this.builder = new ChunkBuilder<>(backend.getVertexType(), this.backend);
+        this.builder = new ChunkBuilder<>(backend.getVertexType(), this.backend, renderDistance);
         this.builder.init(world, renderPassManager);
 
         this.dirty = true;
@@ -467,6 +467,8 @@ public class ChunkRenderManager<T extends ChunkGraphicsState> implements ChunkSt
         if (!futures.isEmpty()) {
             this.backend.upload(RenderDevice.INSTANCE.createCommandList(), new FutureDequeDrain<>(futures));
         }
+
+        this.builder.createMoreThreads();
     }
 
     public void markDirty() {
