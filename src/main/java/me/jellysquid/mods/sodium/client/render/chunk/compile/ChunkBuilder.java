@@ -31,6 +31,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static java.lang.System.currentTimeMillis;
+
 public class ChunkBuilder<T extends ChunkGraphicsState> {
     /**
      * The maximum number of jobs that can be queued for a given worker thread.
@@ -52,14 +54,45 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     private World world;
     private BlockRenderPassManager renderPassManager;
 
-    private final int limitThreads;
+    // This is the initial number of threads we spin up upon ChunkBuilder creation.
+    // Default: 2-4 depending on render distance. *Always* less than hardLimitThreads.
+    private final int initialThreads;
+    // This is the number of threads we want to 'quickly' get up to. This is calculated
+    // by getOptimalThreadCount, but can also be configured by the user. Always less than hardLimitThreads.
+    private final int targetThreads;
+    // This is the number of threads we are allowed to create in total.
+    // This is defaulted to targetThreads, but maxes out at 64. Testing would be required to determine what
+    // actual count is optimal for a specific user and use case.
+    private final int hardLimitThreads;
+    // This is the initial time when this builder is created. We use this to create more threads.
+    private final float initialTime;
+    // This is the user-configurable time delta to create a new thread, up until targetThreads.
+    private final float quickThreadCreationInterval;
+    // This is the user-configurable time delta to create a new thread, up until hardLimitThreads.
+    private final float slowThreadCreationInterval;
+
     private final ChunkVertexType vertexType;
     private final ChunkRenderBackend<T> backend;
 
-    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend) {
+    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend, int viewDistance) {
         this.vertexType = vertexType;
         this.backend = backend;
-        this.limitThreads = getThreadCount();
+
+        // User-configurable options for chunk threads.
+        int desiredTargetThreads = SodiumClientMod.options().advanced.targetChunkThreads;
+        int desiredInitialThreads = SodiumClientMod.options().advanced.initialChunkThreads;
+
+        // Yikes.
+        this.initialTime = currentTimeMillis();
+        this.quickThreadCreationInterval = MathHelper.clamp(SodiumClientMod.options().advanced.quickThreadCreationInterval, 1, 2000);
+        this.slowThreadCreationInterval = MathHelper.clamp(SodiumClientMod.options().advanced.slowThreadCreationInterval, 1, 60000);
+
+        // Our hard limit of threads. Cap at 64, prefer desiredMaxThreads, otherwise use optimal thread count.
+        this.hardLimitThreads = getMaxThreadCount();
+        // Our targeted number of threads.
+        this.targetThreads = MathHelper.clamp(desiredTargetThreads == 0 ? getOptimalThreadCount() : desiredTargetThreads, 1, this.hardLimitThreads);
+        // Our initial threads. A bit of a silly calculation for this one.
+        this.initialThreads = MathHelper.clamp(desiredInitialThreads == 0 ? (viewDistance / 10) + 2 : desiredInitialThreads, 1, this.targetThreads);
     }
 
     /**
@@ -67,16 +100,17 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
      * thread.
      */
     private static int getOptimalThreadCount() {
-        return MathHelper.clamp(Math.max(getMaxThreadCount() / 3, getMaxThreadCount() - 6), 1, 10);
+        return MathHelper.clamp(Math.max(getLcoreCount() / 3, getLcoreCount() - 6), 1, 10);
     }
 
-    private static int getThreadCount() {
-        int requested = SodiumClientMod.options().advanced.chunkUpdateThreads;
-        return requested == 0 ? getOptimalThreadCount() : Math.min(requested, getMaxThreadCount());
-    }
-
-    private static int getMaxThreadCount() {
+    private static int getLcoreCount() {
         return Runtime.getRuntime().availableProcessors();
+    }
+
+    // Split out this function so that SeedQueue can inject into this.
+    private static int getMaxThreadCount() {
+        int desiredMaxThreads = SodiumClientMod.options().advanced.maxChunkThreads;
+        return MathHelper.clamp(desiredMaxThreads == 0 ? getLcoreCount() : desiredMaxThreads, 1, 64);
     }
 
     /**
@@ -84,7 +118,21 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
      * spawn more tasks than the budget allows, it will block until resources become available.
      */
     public int getSchedulingBudget() {
-        return Math.max(0, (this.limitThreads * TASK_QUEUE_LIMIT_PER_WORKER) - this.buildQueue.size());
+        return Math.max(0, (Math.max(this.threads.size(), this.targetThreads) * TASK_QUEUE_LIMIT_PER_WORKER) - this.buildQueue.size());
+    }
+
+    public void createWorker(MinecraftClient client)
+    {
+        ChunkBuildBuffers buffers = new ChunkBuildBuffers(this.vertexType, this.renderPassManager);
+        ChunkRenderCacheLocal pipeline = new ChunkRenderCacheLocal(client, this.world);
+
+        WorkerRunnable worker = new WorkerRunnable(buffers, pipeline);
+
+        Thread thread = new Thread(worker, "Chunk Render Task Executor #" + this.threads.size() + 1);
+        thread.setPriority(Math.max(0, Thread.NORM_PRIORITY - 2));
+        thread.start();
+
+        this.threads.add(thread);
     }
 
     /**
@@ -101,21 +149,18 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         }
 
         MinecraftClient client = MinecraftClient.getInstance();
-
-        for (int i = 0; i < this.limitThreads; i++) {
-            ChunkBuildBuffers buffers = new ChunkBuildBuffers(this.vertexType, this.renderPassManager);
-            ChunkRenderCacheLocal pipeline = new ChunkRenderCacheLocal(client, this.world);
-
-            WorkerRunnable worker = new WorkerRunnable(buffers, pipeline);
-
-            Thread thread = new Thread(worker, "Chunk Render Task Executor #" + i);
-            thread.setPriority(Math.max(0, Thread.NORM_PRIORITY - 2));
-            thread.start();
-
-            this.threads.add(thread);
+        for (int i = 0; i < this.initialThreads; i++) {
+            this.createWorker(client);
         }
 
         LOGGER.info("Started {} worker threads", this.threads.size());
+    }
+
+    /**
+     * Spawns workers if we have thread space.
+     */
+    public void createMoreThreads() {
+
     }
 
     /**
