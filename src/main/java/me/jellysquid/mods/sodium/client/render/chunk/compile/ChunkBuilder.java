@@ -3,6 +3,7 @@ package me.jellysquid.mods.sodium.client.render.chunk.compile;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gl.device.RenderDevice;
 import me.jellysquid.mods.sodium.client.model.vertex.type.ChunkVertexType;
+import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkGraphicsState;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderBackend;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderContainer;
@@ -17,7 +18,6 @@ import me.jellysquid.mods.sodium.client.world.cloned.ChunkRenderContext;
 import me.jellysquid.mods.sodium.client.world.cloned.ClonedChunkSectionCache;
 import me.jellysquid.mods.sodium.common.util.collections.DequeDrain;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
@@ -30,8 +30,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import static java.lang.System.currentTimeMillis;
 
 public class ChunkBuilder<T extends ChunkGraphicsState> {
     /**
@@ -65,7 +63,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     // actual count is optimal for a specific user and use case.
     private final int hardLimitThreads;
     // This is the initial time when this builder is created. We use this to create more threads.
-    private long initialTime;
+    private long lastThreadAddition;
     // This is the user-configurable time delta to create a new thread, up until targetThreads.
     private final long quickThreadCreationInterval;
     // This is the user-configurable time delta to create a new thread, up until hardLimitThreads.
@@ -74,7 +72,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     private final ChunkVertexType vertexType;
     private final ChunkRenderBackend<T> backend;
 
-    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend, int viewDistance) {
+    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend) {
         this.vertexType = vertexType;
         this.backend = backend;
 
@@ -82,8 +80,6 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         int desiredTargetThreads = SodiumClientMod.options().advanced.targetChunkThreads;
         int desiredInitialThreads = SodiumClientMod.options().advanced.initialChunkThreads;
 
-        // Yikes.
-        this.initialTime = currentTimeMillis();
         // These are bounded by the options configuration. Both are measured in milliseconds.
         this.quickThreadCreationInterval = SodiumClientMod.options().advanced.quickThreadCreationInterval;
         this.slowThreadCreationInterval = SodiumClientMod.options().advanced.slowThreadCreationInterval;
@@ -91,27 +87,23 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         // Our hard limit of threads. Cap at 64, prefer desiredMaxThreads, otherwise use optimal thread count.
         this.hardLimitThreads = getMaxThreadCount();
         // Our targeted number of threads.
-        this.targetThreads = MathHelper.clamp(desiredTargetThreads == 0 ? getDefaultTargetThreads() : desiredTargetThreads, 1, this.hardLimitThreads);
+        this.targetThreads = Math.min(desiredTargetThreads == 0 ? getDefaultTargetThreads() : desiredTargetThreads, this.hardLimitThreads);
         // Our initial threads. A bit of a silly calculation for this one.
-        this.initialThreads = MathHelper.clamp(desiredInitialThreads == 0 ? (viewDistance / 10) + 2 : desiredInitialThreads, 1, this.targetThreads);
+        this.initialThreads = Math.min(desiredInitialThreads == 0 ? (SodiumWorldRenderer.getInstance().getRenderDistance() / 10) + 2 : desiredInitialThreads, this.targetThreads);
     }
 
-    /**
-     * Returns the "optimal" number of threads to be used for chunk build tasks. This will always return at least one
-     * thread.
-     */
     private static int getDefaultTargetThreads() {
-        return MathHelper.clamp(Math.max(getLcoreCount() / 3, getLcoreCount() - 6), 1, 10);
+        return MathHelper.clamp(Math.max(getLogicalCoreCount() / 3, getLogicalCoreCount() - 6), 1, 10);
     }
 
-    private static int getLcoreCount() {
+    private static int getLogicalCoreCount() {
         return Runtime.getRuntime().availableProcessors();
     }
 
     // Split out this function so that SeedQueue can inject into this.
     private static int getMaxThreadCount() {
         int desiredMaxThreads = SodiumClientMod.options().advanced.maxChunkThreads;
-        return MathHelper.clamp(desiredMaxThreads == 0 ? getLcoreCount() : desiredMaxThreads, 1, 64);
+        return desiredMaxThreads == 0 ? getLogicalCoreCount() : desiredMaxThreads;
     }
 
     /**
@@ -122,8 +114,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         return Math.max(0, (Math.max(this.threads.size(), this.targetThreads) * TASK_QUEUE_LIMIT_PER_WORKER) - this.buildQueue.size());
     }
 
-    public void createWorker(MinecraftClient client)
-    {
+    public void createWorker(MinecraftClient client) {
         ChunkBuildBuffers buffers = new ChunkBuildBuffers(this.vertexType, this.renderPassManager);
         ChunkRenderCacheLocal pipeline = new ChunkRenderCacheLocal(client, this.world);
 
@@ -136,10 +127,10 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         this.threads.add(thread);
 
         // Helper debug message. Prints at most once per reload, so shouldn't noticeably increase log spam.
-        if (this.threads.size() == this.hardLimitThreads)
-        {
+        if (this.threads.size() == this.hardLimitThreads) {
             LOGGER.info("Reached maximum Sodium builder threads of {}", this.hardLimitThreads);
         }
+        this.lastThreadAddition = System.currentTimeMillis();
     }
 
     /**
@@ -167,26 +158,20 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
      * Spawns workers if we have thread space.
      */
     public void createMoreThreads() {
-        if (this.threads.size() >= this.hardLimitThreads) { return; }
-
-        long currentTime = currentTimeMillis();
-        long timeDelta = currentTime - this.initialTime;
-        if (this.threads.size() < this.targetThreads)
-        {
-            // Check if enough time has elapsed for us to create a target thread.
-            if (timeDelta > this.quickThreadCreationInterval)
-            {
-                this.createWorker(MinecraftClient.getInstance());
-                this.initialTime = currentTime;
-            }
-            // Not enough time has passed. There's no reason to check for the slower interval, so return.
+        if (this.threads.size() >= this.hardLimitThreads) {
             return;
         }
+
+        long timeDelta = System.currentTimeMillis() - this.lastThreadAddition;
+        if (this.threads.size() < this.targetThreads) {
+            // Check if enough time has elapsed for us to create a target thread.
+            if (timeDelta > this.quickThreadCreationInterval) {
+                this.createWorker(MinecraftClient.getInstance());
+            }
+        }
         // Check if enough time has elapsed for us to create a target thread.
-        if (timeDelta > this.slowThreadCreationInterval)
-        {
+        else if (timeDelta > this.slowThreadCreationInterval) {
             this.createWorker(MinecraftClient.getInstance());
-            this.initialTime = currentTime;
         }
     }
 
