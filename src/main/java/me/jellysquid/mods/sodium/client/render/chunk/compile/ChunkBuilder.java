@@ -3,6 +3,7 @@ package me.jellysquid.mods.sodium.client.render.chunk.compile;
 import me.jellysquid.mods.sodium.client.SodiumClientMod;
 import me.jellysquid.mods.sodium.client.gl.device.RenderDevice;
 import me.jellysquid.mods.sodium.client.model.vertex.type.ChunkVertexType;
+import me.jellysquid.mods.sodium.client.render.SodiumWorldRenderer;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkGraphicsState;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderBackend;
 import me.jellysquid.mods.sodium.client.render.chunk.ChunkRenderContainer;
@@ -17,7 +18,6 @@ import me.jellysquid.mods.sodium.client.world.cloned.ChunkRenderContext;
 import me.jellysquid.mods.sodium.client.world.cloned.ClonedChunkSectionCache;
 import me.jellysquid.mods.sodium.common.util.collections.DequeDrain;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.Vector3d;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
@@ -74,7 +74,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
     private final ChunkVertexType vertexType;
     private final ChunkRenderBackend<T> backend;
 
-    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend, int viewDistance) {
+    public ChunkBuilder(ChunkVertexType vertexType, ChunkRenderBackend<T> backend) {
         this.vertexType = vertexType;
         this.backend = backend;
 
@@ -93,13 +93,9 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         // Our targeted number of threads.
         this.targetThreads = MathHelper.clamp(desiredTargetThreads == 0 ? getDefaultTargetThreads() : desiredTargetThreads, 1, this.hardLimitThreads);
         // Our initial threads. A bit of a silly calculation for this one.
-        this.initialThreads = MathHelper.clamp(desiredInitialThreads == 0 ? (viewDistance / 10) + 2 : desiredInitialThreads, 1, this.targetThreads);
+        this.initialThreads = MathHelper.clamp(desiredInitialThreads == 0 ? (SodiumWorldRenderer.getInstance().getRenderDistance() / 10) + 2 : desiredInitialThreads, 1, this.targetThreads);
     }
 
-    /**
-     * Returns the "optimal" number of threads to be used for chunk build tasks. This will always return at least one
-     * thread.
-     */
     private static int getDefaultTargetThreads() {
         return MathHelper.clamp(Math.max(getLcoreCount() / 3, getLcoreCount() - 6), 1, 10);
     }
