@@ -84,13 +84,14 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
 
         // Yikes.
         this.initialTime = currentTimeMillis();
-        this.quickThreadCreationInterval = MathHelper.clamp(SodiumClientMod.options().advanced.quickThreadCreationInterval, 1, 2000);
-        this.slowThreadCreationInterval = MathHelper.clamp(SodiumClientMod.options().advanced.slowThreadCreationInterval, 1, 60000);
+        // These are bounded by the options configuration. Both are measured in milliseconds.
+        this.quickThreadCreationInterval = SodiumClientMod.options().advanced.quickThreadCreationInterval;
+        this.slowThreadCreationInterval = SodiumClientMod.options().advanced.slowThreadCreationInterval;
 
         // Our hard limit of threads. Cap at 64, prefer desiredMaxThreads, otherwise use optimal thread count.
         this.hardLimitThreads = getMaxThreadCount();
         // Our targeted number of threads.
-        this.targetThreads = MathHelper.clamp(desiredTargetThreads == 0 ? getOptimalThreadCount() : desiredTargetThreads, 1, this.hardLimitThreads);
+        this.targetThreads = MathHelper.clamp(desiredTargetThreads == 0 ? getDefaultTargetThreads() : desiredTargetThreads, 1, this.hardLimitThreads);
         // Our initial threads. A bit of a silly calculation for this one.
         this.initialThreads = MathHelper.clamp(desiredInitialThreads == 0 ? (viewDistance / 10) + 2 : desiredInitialThreads, 1, this.targetThreads);
     }
@@ -99,7 +100,7 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
      * Returns the "optimal" number of threads to be used for chunk build tasks. This will always return at least one
      * thread.
      */
-    private static int getOptimalThreadCount() {
+    private static int getDefaultTargetThreads() {
         return MathHelper.clamp(Math.max(getLcoreCount() / 3, getLcoreCount() - 6), 1, 10);
     }
 
