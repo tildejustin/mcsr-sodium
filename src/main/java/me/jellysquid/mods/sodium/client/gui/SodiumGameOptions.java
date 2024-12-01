@@ -27,7 +27,7 @@ public class SodiumGameOptions implements SpeedrunConfig {
         public int initialChunkThreads;
         @Config.Numbers.Whole.Bounds(min = 1, max = 2000)
         public int quickThreadCreationInterval = 100;
-        @Config.Numbers.Whole.Bounds(min = 1, max = 60000)
+        @Config.Numbers.Whole.Bounds(min = 1, max = 10000)
         public int slowThreadCreationInterval = 1000;
         public boolean useChunkMultidraw = true;
         public boolean useBlockFaceCulling = true;
