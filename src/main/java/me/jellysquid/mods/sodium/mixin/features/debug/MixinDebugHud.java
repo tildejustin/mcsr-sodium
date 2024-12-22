@@ -26,7 +26,7 @@ public abstract class MixinDebugHud {
             return cpuNameCache;
         }
 
-        text = text.replace("Ryzen ", "R");
+        text = text.replace("Ryzen Threadripper", "R RT").replace("Ryzen ", "R");
         text = text.replaceAll("AMD|Gen(?= Intel)|[1-9][0-9]th|Intel| Core|\\((?:TM|R)\\)|GHz|Processor|Snapdragon|Qualcomm| -|CPU|with Radeon (?:(?:Vega )?Graphics|Vega Mobile Gfx)|Xeon|RADEON|(?! ),|,(?= )|COMPUTE CORES", "")
                 .trim()
                 .replaceAll(" +", " ");
