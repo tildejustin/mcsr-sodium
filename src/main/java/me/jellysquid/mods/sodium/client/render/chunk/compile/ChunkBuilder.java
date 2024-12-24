@@ -84,16 +84,20 @@ public class ChunkBuilder<T extends ChunkGraphicsState> {
         this.quickThreadCreationInterval = SodiumClientMod.options().advanced.quickThreadCreationInterval;
         this.slowThreadCreationInterval = SodiumClientMod.options().advanced.slowThreadCreationInterval;
 
-        // Our hard limit of threads. Cap at 64, prefer desiredMaxThreads, otherwise use optimal thread count.
+        // Our hard limit of threads. Cap user config at 64, prefer desiredMaxThreads, otherwise use logical core count.
         this.hardLimitThreads = getMaxThreadCount();
         // Our targeted number of threads.
         this.targetThreads = Math.min(desiredTargetThreads == 0 ? getDefaultTargetThreads() : desiredTargetThreads, this.hardLimitThreads);
         // Our initial threads. A bit of a silly calculation for this one.
-        this.initialThreads = Math.min(desiredInitialThreads == 0 ? (SodiumWorldRenderer.getInstance().getRenderDistance() / 10) + 2 : desiredInitialThreads, this.targetThreads);
+        this.initialThreads = Math.min(desiredInitialThreads == 0 ? getDefaultInitialThreads() : desiredInitialThreads, this.targetThreads);
     }
 
     private static int getDefaultTargetThreads() {
         return MathHelper.clamp(Math.max(getLogicalCoreCount() / 3, getLogicalCoreCount() - 6), 1, 10);
+    }
+
+    private static int getDefaultInitialThreads() {
+        return (SodiumWorldRenderer.getInstance().getRenderDistance() / 10) + 2;
     }
 
     private static int getLogicalCoreCount() {
