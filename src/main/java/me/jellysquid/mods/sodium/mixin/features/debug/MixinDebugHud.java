@@ -17,7 +17,7 @@ public abstract class MixinDebugHud {
 
     // @ModifyExpressionValue(method = "getRightText", at = @At(value = "CONSTANT", args = "stringValue=CPU: %s"))
     // private String removeCPUprefix(String original) {
-    //     return original.substring("CPU: ".length());
+    //     return "%s";
     // }
 
     @ModifyExpressionValue(method = "getRightText", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/platform/GlDebugInfo;getCpuInfo()Ljava/lang/String;"))
@@ -27,7 +27,7 @@ public abstract class MixinDebugHud {
         }
 
         text = text.replace("Ryzen Threadripper", "R RT").replace("Ryzen ", "R");
-        text = text.replaceAll("AMD|Gen(?= Intel)|[1-9][0-9]th|Intel| Core|\\((?:TM|R)\\)|GHz|Processor|Snapdragon|Qualcomm| -|CPU|with Radeon (?:(?:Vega )?Graphics|Vega Mobile Gfx)|Xeon|RADEON|(?! ),|,(?= )|COMPUTE CORES", "")
+        text = text.replaceAll("AMD|Gen(?= Intel)|[1-9][0-9]th|Intel| Core|\\((?:TM|R)\\)|GHz|Processor|Snapdragon|Qualcomm| -|CPU|with|w/|Radeon|Vega|Graphics|Vega Mobile Gfx|Xeon|RADEON|(?! ),|,(?= )|COMPUTE CORES", "")
                 .trim()
                 .replaceAll(" +", " ");
 
